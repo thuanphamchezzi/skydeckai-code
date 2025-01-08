@@ -33,6 +33,7 @@ Add to your `claude_desktop_config.json`:
 -   File system operations (read, write, edit, move, delete)
 -   Directory management and traversal
 -   Multi-language code analysis using tree-sitter
+-   Multi-language code execution with safety measures
 -   Git operations (status, diff, commit, branch management)
 -   Security controls with configurable workspace boundaries
 
@@ -196,9 +197,7 @@ Returns:
 -   Code organization statistics
 -   Inheritance relationships
 
-## Supported Languages
-
-Code analysis support for:
+Supported Languages:
 
 -   Python (.py)
 -   JavaScript (.js, .jsx, .mjs, .cjs)
@@ -211,6 +210,79 @@ Code analysis support for:
 -   PHP (.php)
 -   C# (.cs)
 -   Kotlin (.kt, .kts)
+
+### Code Execution
+
+#### execute_code
+
+Executes code in various programming languages with safety measures and restrictions.
+
+```json
+{
+    "language": "python",
+    "code": "print('Hello, World!')",
+    "timeout": 5
+}
+```
+
+**Supported Languages:**
+
+-   Python (python3)
+-   JavaScript (Node.js)
+-   Ruby
+-   PHP
+-   Go
+-   Rust
+
+**Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|---------|----------|---------------------------------------|
+| language | string | Yes | Programming language to use |
+| code | string | Yes | Code to execute |
+| timeout | integer | No | Maximum execution time (default: 5s) |
+
+**Example Usage:**
+
+```bash
+# Python example
+aidd-cli --tool execute_code --args '{
+    "language": "python",
+    "code": "print(sum(range(10)))"
+}'
+
+# JavaScript example
+aidd-cli --tool execute_code --args '{
+    "language": "javascript",
+    "code": "console.log(Array.from({length: 5}, (_, i) => i*2))"
+}'
+
+# Ruby example
+aidd-cli --tool execute_code --args '{
+    "language": "ruby",
+    "code": "puts (1..5).reduce(:+)"
+}'
+
+# Go example
+aidd-cli --tool execute_code --args '{
+    "language": "go",
+    "code": "fmt.Println(\"Hello, Go!\")"
+}'
+```
+
+**Requirements:**
+
+-   Respective language runtimes must be installed
+-   Commands must be available in system PATH
+-   Proper permissions for temporary file creation
+
+⚠️ **Security Warning:**
+This tool executes arbitrary code on your system. Always:
+
+1. Review code thoroughly before execution
+2. Understand the code's purpose and expected outcome
+3. Never execute untrusted code
+4. Be aware of potential system impacts
+5. Monitor execution output
 
 ## Configuration
 

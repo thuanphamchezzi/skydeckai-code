@@ -15,6 +15,9 @@ from .file_tools import (
     delete_file_tool, handle_delete_file,
     get_file_info_tool, handle_get_file_info,
 )
+from .code_execution import (
+    execute_code_tool, handle_execute_code
+)
 from .code_analysis import (
     tree_sitter_map_tool, handle_tree_sitter_map
 )
@@ -40,6 +43,7 @@ TOOL_DEFINITIONS = [
     delete_file_tool(),
     get_file_info_tool(),
     directory_tree_tool(),
+    execute_code_tool(),
     tree_sitter_map_tool(),
     # Git tools
     git_init_tool(),
@@ -71,12 +75,13 @@ TOOL_HANDLERS = {
     "delete_file": handle_delete_file,
     "get_file_info": handle_get_file_info,
     "directory_tree": handle_directory_tree,
+    "execute_code": handle_execute_code,
     "tree_sitter_map": handle_tree_sitter_map,
     # Git handlers
     "git_init": handle_git_init,
     "git_status": handle_git_status,
     "git_diff_unstaged": handle_git_diff_unstaged,
-    "git_diff_staged": handle_git_diff_staged, 
+    "git_diff_staged": handle_git_diff_staged,
     "git_diff": handle_git_diff,
     "git_commit": handle_git_commit,
     "git_add": handle_git_add,

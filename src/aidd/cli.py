@@ -24,7 +24,7 @@ class MCPClient:
 
     async def connect(self):
         """Connect to the AIDD server."""
-        server_params = StdioServerParameters(command="aidd", args=[], env=None)
+        server_params = StdioServerParameters(command="mcp-server-aidd", args=[], env=None)
         transport = await self.exit_stack.enter_async_context(stdio_client(server_params))
         self.session = await self.exit_stack.enter_async_context(ClientSession(*transport))
         await self.session.initialize()

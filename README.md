@@ -1,230 +1,23 @@
 # AiDD MCP Server
 
-AiDD (AI-Driven Development) is a Model Context Protocol server designed to facilitate AI-assisted software development workflows. It provides a secure and efficient interface for AI agents to interact with local file systems and perform code analysis across multiple programming languages using tree-sitter.
+An MCP server for AI-driven development workflows. Provides tools for file system operations, code analysis, and Git operations with support for multiple programming languages through tree-sitter integration.
 
-## Quick Install
+## Installation
 
 ```bash
-# Using npx
-npx @michaellatman/mcp-get@latest install aidd
+# Using mcp-get
+npx @michaellatman/mcp-get@latest install mcp-server-aidd
 
 # Using pip
-pip install aidd
+pip install mcp-server-aidd
 
 # Using uv
-uvx aidd
+uvx mcp-server-aidd
 ```
 
-## Overview
+## Claude Desktop Setup
 
-AiDD implements the Model Context Protocol (MCP) to enable seamless integration between AI agents and development environments. It offers comprehensive file system operations, directory management, and advanced code analysis capabilities while maintaining strict security controls.
-
-## Key Features
-
-### File System Operations
-
--   Secure file reading, writing, and manipulation
--   Batch file operations support
--   Git-aware performance optimizations
--   Detailed file metadata access
--   Comprehensive Git operations support
-
-### Code Analysis
-
--   Multi-language source code parsing
--   Structural analysis of code components
--   Function and class mapping
--   Inheritance and dependency detection
-
-### Security
-
--   Strict directory access controls
--   Path traversal prevention
--   Configurable workspace boundaries
--   Safe file operation handling
-
-## Tool Descriptions
-
-### File Operations
-
-#### read_file
-
--   path(string): Path to the file to read
--   Returns: Content of the file
-
-#### read_multiple_files
-
--   paths(array of strings): List of file paths to read
--   Returns: Contents of all files with headers
-
-#### write_file
-
--   path(string): Path where to write the file
--   content(string): Content to write to the file
-
-#### edit_file
-
--   path(string): File to edit
--   edits(array): List of edit operations
-    -   oldText(string): Text to search for
-    -   newText(string): Text to replace with
--   dryRun(boolean, optional): Preview changes without applying (default: false)
--   options(object, optional):
-    -   preserveIndentation(boolean): Keep existing indentation (default: true)
-    -   normalizeWhitespace(boolean): Normalize spaces (default: true)
-    -   partialMatch(boolean): Enable fuzzy matching (default: true)
-
-#### move_file
-
--   source(string): Source path of the file or directory
--   destination(string): Destination path
-
-#### delete_file
-
--   path(string): Path to the file or empty directory to delete
-
-#### get_file_info
-
--   path(string): Path to the file or directory
--   Returns: Size, timestamps, and permissions
-
-### Directory Operations
-
-#### get_allowed_directory
-
-Returns the current working directory that this server is allowed to access.
-
-#### update_allowed_directory
-
--   directory(string): Directory to allow access to (must be absolute path)
-
-#### list_directory
-
--   path(string): Path of the directory to list
-
-#### create_directory
-
--   path(string): Path of the directory to create
-
-#### directory_tree
-
--   path(string): Root directory to analyze
-
-#### search_files
-
--   pattern(string): Pattern to search for in file names
--   path(string, optional): Starting directory for search (default: ".")
--   include_hidden(boolean, optional): Include hidden files (default: false)
-
-### Code Analysis
-
-#### tree_sitter_map
-
--   path(string): Root directory to analyze
--   Returns: Structural analysis of source code files
-
-### Git Operations
-
-#### git_init
-
--   path(string): Path where to initialize the repository
--   initial_branch(string, optional): Name of the initial branch (defaults to 'main')
--   Returns: Confirmation of repository initialization
-
-#### git_status
-
--   repo_path(string): Path to git repository
--   Returns: Current status of working directory
-
-#### git_diff_unstaged
-
--   repo_path(string): Path to git repository
--   Returns: Diff output of unstaged changes
-
-#### git_diff_staged
-
--   repo_path(string): Path to git repository
--   Returns: Diff output of staged changes
-
-#### git_diff
-
--   repo_path(string): Path to git repository
--   target(string): Target branch or commit to compare with
--   Returns: Diff output comparing current state with target
-
-#### git_commit
-
--   repo_path(string): Path to git repository
--   message(string): Commit message
--   Returns: Confirmation with new commit hash
-
-#### git_add
-
--   repo_path(string): Path to git repository
--   files(array of strings): List of file paths to stage
--   Returns: Confirmation of staged files
-
-#### git_reset
-
--   repo_path(string): Path to git repository
--   Returns: Confirmation of unstaging operation
-
-#### git_log
-
--   repo_path(string): Path to git repository
--   max_count(integer, optional): Maximum number of commits to show (default: 10)
--   Returns: Array of commit entries with hash, author, date, and message
-
-#### git_create_branch
-
--   repo_path(string): Path to git repository
--   branch_name(string): Name of the new branch
--   base_branch(string, optional): Starting point for the new branch
--   Returns: Confirmation of branch creation
-
-#### git_checkout
-
--   repo_path(string): Path to git repository
--   branch_name(string): Name of branch to checkout
--   Returns: Confirmation of branch switch
-
-#### git_show
-
--   repo_path(string): Path to git repository
--   revision(string): The revision (commit hash, branch name, tag) to show
--   Returns: Contents of the specified commit
-
-## Supported Languages
-
-AiDD provides deep code analysis for multiple programming languages through tree-sitter integration:
-
-| Language   | File Extensions                  |
-| ---------- | -------------------------------- |
-| Python     | .py                              |
-| JavaScript | .js, .jsx, .mjs, .cjs            |
-| TypeScript | .ts, .tsx                        |
-| Java       | .java                            |
-| C++        | .cpp, .hpp, .cc, .hh, .cxx, .hxx |
-| Ruby       | .rb, .rake                       |
-| Go         | .go                              |
-| Rust       | .rs                              |
-| PHP        | .php                             |
-| C#         | .cs                              |
-| Kotlin     | .kt, .kts                        |
-
-## Configuration
-
-AiDD stores its configuration in `~/.aidd/config.json`:
-
-```json
-{
-    "allowed_directory": "/path/to/workspace"
-}
-```
-
-## Claude Desktop Integration
-
-Add this to your `claude_desktop_config.json`:
+Add to your `claude_desktop_config.json`:
 
 ```json
 "mcpServers": {
@@ -235,31 +28,230 @@ Add this to your `claude_desktop_config.json`:
 }
 ```
 
-## Debugging
+## Key Features
 
-For the best debugging experience, use the MCP Inspector:
+-   File system operations (read, write, edit, move, delete)
+-   Directory management and traversal
+-   Multi-language code analysis using tree-sitter
+-   Git operations (status, diff, commit, branch management)
+-   Security controls with configurable workspace boundaries
+
+## Available Tools
+
+### Basic File Operations
+
+| Tool                | Parameters                          | Returns                                       |
+| ------------------- | ----------------------------------- | --------------------------------------------- |
+| read_file           | path: string                        | File content                                  |
+| read_multiple_files | paths: string[]                     | Multiple file contents with headers           |
+| write_file          | path: string, content: string       | Success confirmation                          |
+| move_file           | source: string, destination: string | Success confirmation                          |
+| delete_file         | path: string                        | Success confirmation                          |
+| get_file_info       | path: string                        | File metadata (size, timestamps, permissions) |
+
+Common usage:
 
 ```bash
-npx @modelcontextprotocol/inspector --directory /path/to/directory/aidd/src/aidd run aidd
+# Read file
+aidd-cli --tool read_file --args '{"path": "src/main.py"}'
+
+# Write file
+aidd-cli --tool write_file --args '{"path": "output.txt", "content": "Hello World"}'
+
+# Get file info
+aidd-cli --tool get_file_info --args '{"path": "src/main.py"}'
 ```
 
-The Inspector will provide a URL to access the debugging interface in your browser.
+### Complex File Operations
 
-## Security Considerations
+#### edit_file
 
--   All file operations are restricted to the configured allowed directory
--   Path traversal attempts are automatically blocked
--   File permissions are preserved and validated
--   Sensitive operations require explicit configuration
+Pattern-based file editing with preview support:
 
-## Performance Optimization
+```json
+{
+    "path": "src/main.py",
+    "edits": [
+        {
+            "oldText": "def old_function():",
+            "newText": "def new_function():"
+        }
+    ],
+    "dryRun": false,
+    "options": {
+        "preserveIndentation": true,
+        "normalizeWhitespace": true,
+        "partialMatch": true
+    }
+}
+```
 
--   Git-aware operations for improved performance in repositories
--   Efficient batch operations for multiple files
--   Caching of frequently accessed paths
--   Optimized code parsing for large files
+Returns: Diff of changes or preview in dry run mode.
 
-## Upcoming Tools
+### Directory Operations
+
+| Tool                     | Parameters                                               | Returns                        |
+| ------------------------ | -------------------------------------------------------- | ------------------------------ |
+| get_allowed_directory    | none                                                     | Current allowed directory path |
+| update_allowed_directory | directory: string (absolute path)                        | Success confirmation           |
+| list_directory           | path: string                                             | Directory contents list        |
+| create_directory         | path: string                                             | Success confirmation           |
+| search_files             | pattern: string, path?: string, include_hidden?: boolean | Matching files list            |
+
+#### directory_tree
+
+Generates complete directory structure:
+
+```json
+{
+    "path": "src",
+    "include_hidden": false
+}
+```
+
+Returns: JSON tree structure of directory contents.
+
+Common usage:
+
+```bash
+# List directory
+aidd-cli --tool list_directory --args '{"path": "."}'
+
+# Search for Python files
+aidd-cli --tool search_files --args '{"pattern": ".py", "path": "src"}'
+```
+
+### Git Operations
+
+| Tool         | Parameters                             | Returns                          |
+| ------------ | -------------------------------------- | -------------------------------- |
+| git_init     | path: string, initial_branch?: string  | Repository initialization status |
+| git_status   | repo_path: string                      | Working directory status         |
+| git_add      | repo_path: string, files: string[]     | Staging confirmation             |
+| git_reset    | repo_path: string                      | Unstaging confirmation           |
+| git_checkout | repo_path: string, branch_name: string | Branch switch confirmation       |
+
+#### Complex Git Operations
+
+##### git_commit
+
+```json
+{
+    "repo_path": ".",
+    "message": "feat: add new feature"
+}
+```
+
+Returns: Commit hash and confirmation.
+
+##### git_diff
+
+```json
+{
+    "repo_path": ".",
+    "target": "main"
+}
+```
+
+Returns: Detailed diff output.
+
+##### git_log
+
+```json
+{
+    "repo_path": ".",
+    "max_count": 10
+}
+```
+
+Returns: Array of commit entries with hash, author, date, and message.
+
+Common usage:
+
+```bash
+# Check status
+aidd-cli --tool git_status --args '{"repo_path": "."}'
+
+# Create and switch to new branch
+aidd-cli --tool git_create_branch --args '{"repo_path": ".", "branch_name": "feature/new-branch"}'
+```
+
+### Code Analysis
+
+#### tree_sitter_map
+
+Analyzes source code structure:
+
+```json
+{
+    "path": "src"
+}
+```
+
+Returns:
+
+-   Classes and their methods
+-   Functions and parameters
+-   Module structure
+-   Code organization statistics
+-   Inheritance relationships
+
+## Supported Languages
+
+Code analysis support for:
+
+-   Python (.py)
+-   JavaScript (.js, .jsx, .mjs, .cjs)
+-   TypeScript (.ts, .tsx)
+-   Java (.java)
+-   C++ (.cpp, .hpp, .cc)
+-   Ruby (.rb, .rake)
+-   Go (.go)
+-   Rust (.rs)
+-   PHP (.php)
+-   C# (.cs)
+-   Kotlin (.kt, .kts)
+
+## Configuration
+
+Configuration file: `~/.aidd/config.json`
+
+```json
+{
+    "allowed_directory": "/path/to/workspace"
+}
+```
+
+## CLI Usage
+
+Basic command structure:
+
+```bash
+aidd-cli --tool <tool_name> --args '<json_arguments>'
+
+# List available tools
+aidd-cli --list-tools
+
+# Enable debug output
+aidd-cli --debug --tool <tool_name> --args '<json_arguments>'
+```
+
+## Debugging
+
+Use MCP Inspector for debugging:
+
+```bash
+npx @modelcontextprotocol/inspector run
+```
+
+## Security
+
+-   Operations restricted to configured allowed directory
+-   Path traversal prevention
+-   File permission preservation
+-   Safe operation handling
+
+## Upcoming Features
 
 -   GitHub tools:
     -   PR Description Generator
@@ -271,8 +263,8 @@ The Inspector will provide a URL to access the debugging interface in your brows
 
 ## Development Status
 
-Please note that AiDD is currently in development and functionality may be subject to change.
+Currently in active development. Features and API may change.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](LICENSE)

@@ -1,6 +1,6 @@
 [project]
 name = "mcp-server-aidd"
-version = "0.1.4"
+version = "0.1.6"
 description = "This MCP server provides a set of tools that support AI-driven Development workflows."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -39,4 +39,5 @@ build-backend = "hatchling.build"
 
 [project.scripts]
 mcp-server-aidd = "aidd:main"
+aidd = "aidd:main"
 aidd-cli = "aidd.cli:main"

@@ -29,9 +29,9 @@ dependencies = [
 packages = ["src/aidd"]
 
 [project.urls]
-Homepage = "https://www.skydeck.ai/"
-Repository = "git@github.com:skydeckai/skydeck-desktop.git"
-Documentation = "https://github.com/skydeckai/skydeck-desktop/tree/main/mcp_servers/aidd#readme"
+Homepage = "https://github.com/skydeckai/mcp-server-aidd"
+Repository = "https://github.com/skydeckai/mcp-server-aidd"
+Documentation = "https://github.com/skydeckai/mcp-server-aidd/blob/main/README.md"
 
 [build-system]
 requires = [ "hatchling",]

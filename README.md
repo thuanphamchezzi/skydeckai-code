@@ -2,6 +2,8 @@
 
 An MCP server for AI-driven development workflows. Provides tools for file system operations, code analysis, and Git operations with support for multiple programming languages through tree-sitter integration.
 
+<a href="https://glama.ai/mcp/servers/mpixtij6se"><img width="380" height="200" src="https://glama.ai/mcp/servers/mpixtij6se/badge" alt="AiDD Server MCP server" /></a>
+
 ## Installation
 
 ```bash

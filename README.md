@@ -1,6 +1,6 @@
 # AiDD MCP Server
 
-An MCP server for AI-driven development workflows. Provides tools for file system operations, code analysis, and Git operations with support for multiple programming languages through tree-sitter integration.
+An MCP server that provides a comprehensive set of tools for AI-driven development workflows. Features include file system operations, code analysis using tree-sitter for multiple programming languages, Git operations, code execution, and system information retrieval. Designed to enhance AI's capability to assist in software development tasks.
 
 ## Installation
 
@@ -213,15 +213,16 @@ Supported Languages:
 
 ### System Information
 
-| Tool            | Parameters | Returns                        |
-| --------------- | ---------- | ------------------------------ |
-| get_system_info | none       | Comprehensive system details   |
+| Tool            | Parameters | Returns                      |
+| --------------- | ---------- | ---------------------------- |
+| get_system_info | none       | Comprehensive system details |
 
 Returns:
+
 ```json
 {
   "working_directory": "/path/to/project",
-  "system": { 
+  "system": {
     "os", "os_version", "architecture", "python_version"
   },
   "wifi_network": "MyWiFi",

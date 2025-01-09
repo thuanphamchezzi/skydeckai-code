@@ -20,10 +20,12 @@ uvx mcp-server-aidd
 Add to your `claude_desktop_config.json`:
 
 ```json
-"mcpServers": {
-    "aidd": {
-        "command": "aidd",
-        "args": []
+{
+    "mcpServers": {
+        "mcp-server-aidd": {
+            "command": "uvx",
+            "args": ["mcp-server-aidd"]
+        }
     }
 }
 ```

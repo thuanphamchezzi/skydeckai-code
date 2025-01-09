@@ -49,6 +49,8 @@ def execute_code_tool() -> Dict[str, Any]:
         "description": (
             "Execute code in various programming languages. "
             "Supported languages: " + ", ".join(LANGUAGE_CONFIGS.keys()) + ". "
+            "This tool is useful when you need to perform a task on user local machine, such as opening an application, installing a package, running a script, etc. "
+            "Any time the user asks you to do something on their local machine, you should use this tool. "
             "Please review the code carefully before execution. "
             "You MUST explicitly confirm with the user before using this tool. "
             "Examples: "

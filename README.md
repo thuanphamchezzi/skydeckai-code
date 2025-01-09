@@ -211,6 +211,40 @@ Supported Languages:
 -   C# (.cs)
 -   Kotlin (.kt, .kts)
 
+### System Information
+
+| Tool            | Parameters | Returns                        |
+| --------------- | ---------- | ------------------------------ |
+| get_system_info | none       | Comprehensive system details   |
+
+Returns:
+```json
+{
+  "working_directory": "/path/to/project",
+  "system": { 
+    "os", "os_version", "architecture", "python_version"
+  },
+  "wifi_network": "MyWiFi",
+  "cpu": {
+    "physical_cores", "logical_cores", "total_cpu_usage"
+  },
+  "memory": { "total", "available", "used_percentage" },
+  "disk": { "total", "free", "used_percentage" },
+  "mac_details": {  // Only present on macOS
+    "model": "Mac mini",
+    "chip": "Apple M2",
+    "serial_number": "XXX"
+  }
+}
+```
+
+Provides essential system information in a clean, readable format.
+
+```bash
+# Get system information
+aidd-cli --tool get_system_info
+```
+
 ### Code Execution
 
 #### execute_code

@@ -27,6 +27,9 @@ from .git_tools import (
     handle_git_init, handle_git_status, handle_git_diff_unstaged, handle_git_diff_staged, handle_git_diff, handle_git_commit,
     handle_git_add, handle_git_reset, handle_git_log, handle_git_create_branch, handle_git_checkout, handle_git_show
 )
+from .system_tools import (
+    get_system_info_tool, handle_get_system_info
+)
 
 # Export all tools definitions
 TOOL_DEFINITIONS = [
@@ -58,6 +61,7 @@ TOOL_DEFINITIONS = [
     git_create_branch_tool(),
     git_checkout_tool(),
     git_show_tool(),
+    get_system_info_tool(),
 ]
 
 # Export all handlers
@@ -90,4 +94,5 @@ TOOL_HANDLERS = {
     "git_create_branch": handle_git_create_branch,
     "git_checkout": handle_git_checkout,
     "git_show": handle_git_show,
+    "get_system_info": handle_get_system_info,
 }

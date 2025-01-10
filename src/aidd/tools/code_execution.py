@@ -47,11 +47,10 @@ def execute_code_tool() -> Dict[str, Any]:
     return {
         "name": "execute_code",
         "description": (
-            "Execute code in various programming languages. "
+            "Execute arbitrary code in various programming languages on the user's local machine within the current working directory. "
             "Supported languages: " + ", ".join(LANGUAGE_CONFIGS.keys()) + ". "
-            "This tool is useful when you need to perform a task on user local machine, such as opening an application, installing a package, running a script, etc. "
-            "Any time the user asks you to do something on their local machine, you should use this tool. "
-            "Please review the code carefully before execution. "
+            "This tool is designed to perform tasks on the user's local environment, such as opening applications, installing packages, running scripts, and more. "
+            "Always review the code carefully before execution to prevent unintended consequences. "
             "You MUST explicitly confirm with the user before using this tool. "
             "Examples: "
             "- Python: code='print(sum(range(10)))'. "
@@ -68,7 +67,7 @@ def execute_code_tool() -> Dict[str, Any]:
                 },
                 "code": {
                     "type": "string",
-                    "description": "Code to execute"
+                    "description": "Code to execute on the user's local machine in the current working directory"
                 },
                 "timeout": {
                     "type": "integer",
@@ -112,28 +111,24 @@ def prepare_code(code: str, language: str) -> str:
 async def execute_code_in_temp_file(language: str, code: str, timeout: int) -> tuple[str, str, int]:
     """Execute code in a temporary file and return stdout, stderr, and return code."""
     config = LANGUAGE_CONFIGS[language]
-
-    # Create temporary directory within allowed directory
-    temp_dir = os.path.join(state.allowed_directory, '.temp_code_execution')
-    os.makedirs(temp_dir, exist_ok=True)
+    temp_file = f"temp_script{config['file_extension']}"
 
     try:
-        with tempfile.NamedTemporaryFile(
-            suffix=config['file_extension'],
-            mode='w',
-            dir=temp_dir,
-            delete=False
-        ) as temp_file:
+        # Change to allowed directory first
+        os.chdir(state.allowed_directory)
+
+        # Write code to temp file
+        with open(temp_file, 'w') as f:
             # Prepare and write code
             prepared_code = prepare_code(code, language)
-            temp_file.write(prepared_code)
-            temp_file.flush()
+            f.write(prepared_code)
+            f.flush()
 
             # Prepare command
             if language == 'rust':
                 # Special handling for Rust
-                output_path = temp_file.name + '.exe'
-                compile_cmd = ['rustc', temp_file.name, '-o', output_path]
+                output_path = 'temp_script.exe'
+                compile_cmd = ['rustc', temp_file, '-o', output_path]
                 try:
                     subprocess.run(compile_cmd,
                                  check=True,
@@ -143,7 +138,7 @@ async def execute_code_in_temp_file(language: str, code: str, timeout: int) -> t
                 except subprocess.CalledProcessError as e:
                     return '', e.stderr.decode(), e.returncode
             else:
-                cmd = config['command'] + [temp_file.name]
+                cmd = config['command'] + [temp_file]
 
             # Execute code
             try:
@@ -151,7 +146,7 @@ async def execute_code_in_temp_file(language: str, code: str, timeout: int) -> t
                     cmd,
                     capture_output=True,
                     timeout=timeout,
-                    text=True
+                    text=True,
                 )
                 return result.stdout, result.stderr, result.returncode
             except subprocess.TimeoutExpired:
@@ -159,8 +154,9 @@ async def execute_code_in_temp_file(language: str, code: str, timeout: int) -> t
 
     finally:
         # Cleanup
+        # Note: We stay in the allowed directory as all operations should happen there
         try:
-            os.unlink(temp_file.name)
+            os.unlink(temp_file)
             if language == 'rust' and os.path.exists(output_path):
                 os.unlink(output_path)
         except Exception:

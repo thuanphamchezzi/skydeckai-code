@@ -24,7 +24,7 @@ Add to your `claude_desktop_config.json`:
 ```json
 {
     "mcpServers": {
-        "mcp-server-aidd": {
+        "aidd-ai-software-development-utilities": {
             "command": "uvx",
             "args": ["mcp-server-aidd"]
         }

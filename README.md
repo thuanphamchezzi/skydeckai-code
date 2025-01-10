@@ -323,6 +323,58 @@ This tool executes arbitrary code on your system. Always:
 4. Be aware of potential system impacts
 5. Monitor execution output
 
+#### execute_shell_script
+
+Executes shell scripts (bash/sh) with safety measures and restrictions.
+
+```json
+{
+    "script": "echo \"Current directory:\" && pwd",
+    "timeout": 300
+}
+```
+
+**Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|---------|----------|---------------------------------------|
+| script | string | Yes | Shell script to execute |
+| timeout | integer | No | Maximum execution time (default: 300s, max: 600s) |
+
+**Example Usage:**
+
+```bash
+# List directory contents with details
+aidd-cli --tool execute_shell_script --args '{
+    "script": "ls -la"
+}'
+
+# Find all Python files recursively
+aidd-cli --tool execute_shell_script --args '{
+    "script": "find . -name \"*.py\" -type f"
+}'
+
+# Complex script with multiple commands
+aidd-cli --tool execute_shell_script --args '{
+    "script": "echo \"System Info:\" && uname -a && echo \"\nDisk Usage:\" && df -h"
+}'
+```
+
+**Features:**
+
+-   Uses /bin/sh for maximum compatibility across systems
+-   Executes within the allowed directory
+-   Separate stdout and stderr output
+-   Proper error handling and timeout controls
+
+⚠️ **Security Warning:**
+This tool executes arbitrary shell commands on your system. Always:
+
+1. Review the script thoroughly before execution
+2. Understand the script's purpose and expected outcome
+3. Never execute untrusted scripts
+4. Be aware of potential system impacts
+5. Monitor execution output
+
 ## Configuration
 
 Configuration file: `~/.aidd/config.json`

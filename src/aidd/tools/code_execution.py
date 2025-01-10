@@ -49,7 +49,6 @@ def execute_code_tool() -> Dict[str, Any]:
         "description": (
             "Execute arbitrary code in various programming languages on the user's local machine within the current working directory. "
             "Supported languages: " + ", ".join(LANGUAGE_CONFIGS.keys()) + ". "
-            "This tool is designed to perform tasks on the user's local environment, such as opening applications, installing packages, running scripts, and more. "
             "Always review the code carefully before execution to prevent unintended consequences. "
             "You MUST explicitly show the user the code that will be executed and get his confirmation before using this tool. "
             "Examples: "
@@ -87,7 +86,7 @@ def execute_shell_script_tool() -> Dict[str, Any]:
         "description": (
             "Execute a shell script (bash/sh) on the user's local machine within the current working directory. "
             "This tool can execute shell commands and scripts for system automation and management tasks. "
-            "The script will be executed with the default shell (usually bash or sh). "
+            "It is designed to perform tasks on the user's local environment, such as opening applications, installing packages and more. "
             "Always review the script carefully before execution to prevent unintended consequences. "
             "You MUST explicitly show the user the script that will be executed and get his confirmation before using this tool. "
             "Examples: "

@@ -16,7 +16,8 @@ from .file_tools import (
     get_file_info_tool, handle_get_file_info,
 )
 from .code_execution import (
-    execute_code_tool, handle_execute_code
+    execute_code_tool, handle_execute_code,
+    execute_shell_script_tool, handle_execute_shell_script
 )
 from .code_analysis import (
     tree_sitter_map_tool, handle_tree_sitter_map
@@ -47,6 +48,7 @@ TOOL_DEFINITIONS = [
     get_file_info_tool(),
     directory_tree_tool(),
     execute_code_tool(),
+    execute_shell_script_tool(),
     tree_sitter_map_tool(),
     # Git tools
     git_init_tool(),
@@ -80,6 +82,7 @@ TOOL_HANDLERS = {
     "get_file_info": handle_get_file_info,
     "directory_tree": handle_directory_tree,
     "execute_code": handle_execute_code,
+    "execute_shell_script": handle_execute_shell_script,
     "tree_sitter_map": handle_tree_sitter_map,
     # Git handlers
     "git_init": handle_git_init,

@@ -1,7 +1,7 @@
 import subprocess
-import tempfile
 import os
 from typing import List, Dict, Any
+import stat
 import mcp.types as types
 from .state import state
 
@@ -51,7 +51,7 @@ def execute_code_tool() -> Dict[str, Any]:
             "Supported languages: " + ", ".join(LANGUAGE_CONFIGS.keys()) + ". "
             "This tool is designed to perform tasks on the user's local environment, such as opening applications, installing packages, running scripts, and more. "
             "Always review the code carefully before execution to prevent unintended consequences. "
-            "You MUST explicitly confirm with the user before using this tool. "
+            "You MUST explicitly show the user the code that will be executed and get his confirmation before using this tool. "
             "Examples: "
             "- Python: code='print(sum(range(10)))'. "
             "- JavaScript: code='console.log(Array.from({length: 5}, (_, i) => i*2))'. "
@@ -78,6 +78,36 @@ def execute_code_tool() -> Dict[str, Any]:
                 }
             },
             "required": ["language", "code"]
+        }
+    }
+
+def execute_shell_script_tool() -> Dict[str, Any]:
+    return {
+        "name": "execute_shell_script",
+        "description": (
+            "Execute a shell script (bash/sh) on the user's local machine within the current working directory. "
+            "This tool can execute shell commands and scripts for system automation and management tasks. "
+            "The script will be executed with the default shell (usually bash or sh). "
+            "Always review the script carefully before execution to prevent unintended consequences. "
+            "You MUST explicitly show the user the script that will be executed and get his confirmation before using this tool. "
+            "Examples: "
+            "- script='echo \"Current directory:\" && pwd'. "
+            "- script='for i in {1..5}; do echo $i; done'. "
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "script": {
+                    "type": "string",
+                    "description": "Shell script to execute on the user's local machine"
+                },
+                "timeout": {
+                    "type": "integer",
+                    "description": "Maximum execution time in seconds (default: 300, max: 600)",
+                    "default": 300
+                }
+            },
+            "required": ["script"]
         }
     }
 
@@ -204,4 +234,68 @@ async def handle_execute_code(arguments: dict) -> List[types.TextContent]:
         return [types.TextContent(
             type="text",
             text=f"Error executing code:\n{str(e)}"
+        )]
+
+async def execute_shell_script_in_temp_file(script: str, timeout: int) -> tuple[str, str, int]:
+    """Execute a shell script in a temporary file and return stdout, stderr, and return code."""
+    temp_file = "temp_script.sh"
+
+    try:
+        # Change to allowed directory first
+        os.chdir(state.allowed_directory)
+
+        # Write script to temp file
+        with open(temp_file, 'w') as f:
+            f.write("#!/bin/sh\n")  # Use sh for maximum compatibility
+            f.write(script)
+            f.flush()
+
+        # Make the script executable
+        os.chmod(temp_file, os.stat(temp_file).st_mode | stat.S_IEXEC)
+
+        # Execute script
+        try:
+            result = subprocess.run(
+                ["/bin/sh", temp_file],  # Use sh explicitly for consistent behavior
+                capture_output=True,
+                timeout=timeout,
+                text=True,
+            )
+            return result.stdout, result.stderr, result.returncode
+        except subprocess.TimeoutExpired:
+            return '', f'Execution timed out after {timeout} seconds', 124
+
+    finally:
+        # Cleanup
+        try:
+            os.unlink(temp_file)
+        except Exception:
+            pass
+
+async def handle_execute_shell_script(arguments: dict) -> List[types.TextContent]:
+    """Handle shell script execution."""
+    script = arguments.get("script")
+    timeout = min(arguments.get("timeout", 300), 600)  # Default 5 minutes, cap at 10 minutes
+
+    try:
+        stdout, stderr, returncode = await execute_shell_script_in_temp_file(script, timeout)
+        result = []
+        if stdout:
+            result.append(f"=== stdout ===\n{stdout.rstrip()}")
+        if stderr:
+            result.append(f"=== stderr ===\n{stderr.rstrip()}")
+        if not stdout and not stderr:
+            result.append("Script executed successfully with no output")
+        if returncode != 0:
+            result.append(f"\nScript exited with code {returncode}")
+
+        return [types.TextContent(
+            type="text",
+            text="\n\n".join(result)
+        )]
+
+    except Exception as e:
+        return [types.TextContent(
+            type="text",
+            text=f"Error executing shell script:\n{str(e)}"
         )]

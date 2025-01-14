@@ -1,5 +1,7 @@
-from typing import Dict, Any
+from typing import Any, Dict
+
 import mcp.types as types
+
 
 class Tool:
     """Base class for all tools"""

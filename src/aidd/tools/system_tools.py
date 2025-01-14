@@ -1,11 +1,14 @@
-import platform
-import psutil
 import json
-from typing import Dict, Any, List
-import mcp.types as types
-import subprocess
+import platform
 import re
+import subprocess
+from typing import Any, Dict, List
+
+import mcp.types as types
+import psutil
+
 from .state import state
+
 
 def get_system_info_tool():
     return {
@@ -43,7 +46,7 @@ def get_wifi_info() -> str:
             if process.returncode == 0:
                 for line in process.stdout.split('\n'):
                     if "Current Network Information:" in line:
-                        next_line = next((l.strip() for l in process.stdout.split('\n')[process.stdout.split('\n').index(line)+1:] if l.strip()), "")
+                        next_line = next((line_text.strip() for line_text in process.stdout.split('\n')[process.stdout.split('\n').index(line)+1:] if line_text.strip()), "")
                         return next_line.rstrip(':')
         elif platform.system() == "Linux":
             cmd = ["nmcli", "-t", "-f", "active,ssid", "dev", "wifi"]

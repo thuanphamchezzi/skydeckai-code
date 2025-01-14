@@ -1,21 +1,22 @@
+import json
 import os
-from tree_sitter import Language, Parser
-import tree_sitter_python
-import tree_sitter_javascript
-from tree_sitter_typescript._binding import language_typescript, language_tsx
-import tree_sitter_java
-import tree_sitter_cpp
-import tree_sitter_ruby
-import tree_sitter_go
-import tree_sitter_rust
-from tree_sitter_php._binding import language_php
+import subprocess
+from typing import Any, Dict, List
+
 import tree_sitter_c_sharp
+import tree_sitter_cpp
+import tree_sitter_go
+import tree_sitter_java
+import tree_sitter_javascript
 import tree_sitter_kotlin
+import tree_sitter_python
+import tree_sitter_ruby
+import tree_sitter_rust
+from tree_sitter import Language, Parser
+from tree_sitter_php._binding import language_php
+from tree_sitter_typescript._binding import language_tsx, language_typescript
 
 from .state import state
-from typing import Dict, Any, List
-import subprocess
-import json
 
 # Map of file extensions to language names
 LANGUAGE_MAP = {
@@ -679,7 +680,8 @@ async def handle_tree_sitter_map(arguments: dict):
             if errors:
                 sections.append("\n===ERRORS===")
                 for error in errors:
-                    sections.append(f"{error['path']}: {error['error'].split('\n')[0]}")  # Take only the first line of error
+                    error_first_line = error['error'].split('\n')[0]
+                    sections.append(f"{error['path']}: {error_first_line}")
 
             # Add repository map
             sections.append("\n===REPOSITORY STRUCTURE===")

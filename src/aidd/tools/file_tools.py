@@ -1,13 +1,16 @@
-import re
 import difflib
 import json
 import os
+import re
 import stat
 import subprocess
-from typing import List
-import mcp.types as types
 from datetime import datetime
+from typing import List
+
+import mcp.types as types
+
 from .state import state
+
 
 def read_file_tool():
     return {
@@ -716,8 +719,9 @@ async def apply_file_edits(file_path: str, edits: List[dict], dry_run: bool = Fa
             f.write(modified_content)
 
     # Return results
-    return f"{'=== Failed Matches ===\n' + json.dumps(failed_matches, indent=2) + '\n\n' if failed_matches else ''}" + \
-           f"{'=== Diff ===\n'}{diff}"
+    failed_matches_text = '=== Failed Matches ===\n' + json.dumps(failed_matches, indent=2) + '\n\n' if failed_matches else ''
+    diff_text = f'=== Diff ===\n{diff}'
+    return failed_matches_text + diff_text
 
 async def handle_edit_file(arguments: dict):
     """Handle editing a file with pattern matching and formatting."""

@@ -1,9 +1,11 @@
 import os
-from datetime import datetime
-from typing import List, Dict, Any, Optional
+from typing import List
+
 import git
 from mcp.types import TextContent
+
 from .state import state
+
 
 def _get_repo(repo_path: str) -> git.Repo:
     """Helper function to get git repo with validation."""
@@ -60,7 +62,7 @@ async def handle_git_init(arguments: dict) -> List[TextContent]:
 
     try:
         os.makedirs(full_path, exist_ok=True)
-        repo = git.Repo.init(full_path, initial_branch=initial_branch)
+        git.Repo.init(full_path, initial_branch=initial_branch)
         return [TextContent(
             type="text",
             text=f"Initialized empty Git repository in {path} with initial branch '{initial_branch}'"

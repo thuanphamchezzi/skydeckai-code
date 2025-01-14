@@ -1,9 +1,12 @@
-import os
-from datetime import datetime
-import subprocess
 import json
-from .state import state
+import os
+import subprocess
+from datetime import datetime
+
 from mcp.types import TextContent
+
+from .state import state
+
 
 def list_directory_tool():
     return {
@@ -219,7 +222,7 @@ async def handle_directory_tree(arguments: dict):
             # Add all intermediate directories
             for i in range(len(parts)):
                 parent = os.sep.join(parts[:i])
-                current = os.sep.join(parts[:i+1])
+                os.sep.join(parts[:i+1])
                 if i < len(parts) - 1:  # It's a directory
                     directory_map.setdefault(parent, {"dirs": set(), "files": set()})["dirs"].add(parts[i])
                 else:  # It's a file

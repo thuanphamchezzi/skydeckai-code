@@ -5,12 +5,12 @@ import asyncio
 import json
 import sys
 import traceback
-from typing import Optional
 from contextlib import AsyncExitStack
+from typing import Optional
+
 from mcp.client.session import ClientSession
-from mcp.client.stdio import StdioServerParameters
-from mcp.types import TextContent, CallToolResult
-from mcp.client.stdio import stdio_client
+from mcp.client.stdio import StdioServerParameters, stdio_client
+from mcp.types import CallToolResult, TextContent
 
 
 class MCPClient:

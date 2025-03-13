@@ -13,7 +13,7 @@ from .state import state
 def get_system_info_tool():
     return {
         "name": "get_system_info",
-        "description": "Get detailed system information including OS, CPU, memory, disk, and network details (such as WiFi network name). "
+        "description": "Get detailed system information including OS, CPU, memory, disk, hardware information, and network details (such as WiFi network name). "
                     "This tool provides comprehensive information about the system environment. "
                     "Also returns the current working directory (allowed directory) of the AiDD MCP server. "
                     "Useful for system analysis, debugging, environment verification, and workspace management.",

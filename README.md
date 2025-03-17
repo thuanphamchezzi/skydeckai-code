@@ -40,6 +40,8 @@ Add to your `claude_desktop_config.json`:
 -   Multi-language code execution with safety measures
 -   Git operations (status, diff, commit, branch management)
 -   Security controls with configurable workspace boundaries
+-   Screenshot and screen context tools
+-   Image handling tools
 
 ## Available Tools
 
@@ -249,6 +251,137 @@ Provides essential system information in a clean, readable format.
 # Get system information
 aidd-cli --tool get_system_info
 ```
+
+### Screen Context and Image Tools
+
+#### get_active_apps
+
+Returns a list of currently active applications on the user's system.
+
+```json
+{
+    "with_details": true
+}
+```
+
+**Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|---------|----------|---------------------------------------|
+| with_details | boolean | No | Whether to include additional details about each application (default: false) |
+
+**Returns:**
+
+```json
+{
+    "success": true,
+    "platform": "macos",
+    "app_count": 12,
+    "apps": [
+        {
+            "name": "Firefox",
+            "has_windows": true,
+            "window_count": 3,
+            "visible_windows": [
+                { "name": "GitHub - Mozilla Firefox", "width": 1200, "height": 800 }
+            ]
+        },
+        {
+            "name": "VSCode",
+            "has_windows": true
+        }
+    ]
+}
+```
+
+This tool provides valuable context about applications currently running on the user's system, which can help with providing more relevant assistance.
+
+#### get_available_windows
+
+Returns detailed information about all available windows currently displayed on the user's screen.
+
+```json
+{}
+```
+
+**Returns:**
+
+```json
+{
+    "success": true,
+    "platform": "macos",
+    "count": 8,
+    "windows": [
+        {
+            "id": 42,
+            "title": "Document.txt - Notepad",
+            "app": "Notepad",
+            "visible": true
+        },
+        {
+            "title": "Terminal",
+            "app": "Terminal",
+            "visible": true,
+            "active": true
+        }
+    ]
+}
+```
+
+This tool helps understand what's visible on the user's screen and can be used for context-aware assistance.
+
+#### capture_screenshot
+
+Captures a screenshot of the user's screen or a specific window.
+
+```json
+{
+    "output_path": "screenshots/capture.png",
+    "capture_mode": {
+        "type": "named_window",
+        "window_name": "Visual Studio Code"
+    }
+}
+```
+
+**Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|---------|----------|---------------------------------------|
+| output_path | string | No | Path where the screenshot should be saved (default: generated path) |
+| capture_mode | object | No | Specifies what to capture |
+| capture_mode.type | string | No | Type of screenshot: 'full', 'active_window', or 'named_window' (default: 'full') |
+| capture_mode.window_name | string | No | Name of window to capture (required when type is 'named_window') |
+
+**Returns:**
+
+```json
+{
+    "success": true,
+    "path": "/path/to/screenshots/capture.png"
+}
+```
+
+This tool captures screenshots for visualization, debugging, or context-aware assistance.
+
+#### read_image_file
+
+Reads an image file from the file system and returns its contents as a base64-encoded string.
+
+```json
+{
+    "path": "images/logo.png"
+}
+```
+
+**Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|---------|----------|---------------------------------------|
+| path | string | Yes | Path to the image file to read |
+| max_size | integer | No | Maximum file size in bytes (default: 100MB) |
+
+**Returns:**
+Base64-encoded image data that can be displayed or processed.
+
+This tool supports common image formats like PNG, JPEG, GIF, and WebP, and automatically resizes images for optimal viewing.
 
 ### Code Execution
 

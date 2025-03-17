@@ -31,6 +31,8 @@ from .file_tools import (
     search_files_tool,
     write_file_tool,
 )
+from .get_active_apps_tool import get_active_apps_tool, handle_get_active_apps
+from .get_available_windows_tool import get_available_windows_tool, handle_get_available_windows
 from .git_tools import (
     git_add_tool,
     git_checkout_tool,
@@ -57,11 +59,16 @@ from .git_tools import (
     handle_git_show,
     handle_git_status,
 )
+from .image_tools import read_image_file_tool, handle_read_image_file
 from .path_tools import (
     get_allowed_directory_tool,
     handle_get_allowed_directory,
     handle_update_allowed_directory,
     update_allowed_directory_tool,
+)
+from .screenshot_tool import (
+    capture_screenshot_tool,
+    handle_capture_screenshot,
 )
 from .system_tools import get_system_info_tool, handle_get_system_info
 
@@ -97,6 +104,13 @@ TOOL_DEFINITIONS = [
     git_checkout_tool(),
     git_show_tool(),
     get_system_info_tool(),
+    # Screenshot tools
+    capture_screenshot_tool(),
+    # System context tools
+    get_active_apps_tool(),
+    get_available_windows_tool(),
+    # Image tools
+    read_image_file_tool(),
 ]
 
 # Export all handlers
@@ -131,4 +145,11 @@ TOOL_HANDLERS = {
     "git_checkout": handle_git_checkout,
     "git_show": handle_git_show,
     "get_system_info": handle_get_system_info,
+    # Screenshot handlers
+    "capture_screenshot": handle_capture_screenshot,
+    # System context handlers
+    "get_active_apps": handle_get_active_apps,
+    "get_available_windows": handle_get_available_windows,
+    # Image handlers
+    "read_image_file": handle_read_image_file,
 }

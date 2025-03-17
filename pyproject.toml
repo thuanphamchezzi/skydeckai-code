@@ -1,6 +1,6 @@
 [project]
 name = "mcp-server-aidd"
-version = "0.1.15"
+version = "0.1.16"
 description = "This MCP server provides a set of tools that support AI-driven Development workflows."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -9,7 +9,7 @@ license = {text = "MIT"}
 keywords = ["mcp", "development", "ai", "aidd", "code-analysis"]
 
 dependencies = [
-    "mcp>=1.1.2",
+    "mcp>=1.4.1",
     "tree-sitter>=0.23.2",
     "tree-sitter-c-sharp>=0.23.1",
     "tree-sitter-cpp>=0.23.4",
@@ -24,6 +24,10 @@ dependencies = [
     "tree-sitter-typescript>=0.23.2",
     "GitPython>=3.1.44",
     "psutil>=6.1.1",
+    "mss>=10.0.0",
+    "pygetwindow>=0.0.9",
+    "pyobjc-framework-Quartz>=9.0.0",
+    "Pillow>=11.0.0",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -36,7 +40,7 @@ dependencies = [
 ]
 
 [tool.ruff]
-line-length = 200
+line-length = 250
 target-version = "py311"
 
 # Enable rules

@@ -42,6 +42,12 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
+## SkyDeck AI Helper App
+
+If you're using SkyDeck AI Helper app, you can search for "AiDD" and install the mcp-server-aidd.
+
+![SkyDeck AI Helper App](/screenshots/mcp_server_aidd_skydeck_ai_helper.png)
+
 ## Key Features
 
 -   File system operations (read, write, edit, move, delete)
@@ -573,4 +579,4 @@ Currently in active development. Features and API may change.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE)
+Apache License 2.0 - see [LICENSE](LICENSE)

@@ -1,6 +1,6 @@
 [project]
 name = "mcp-server-aidd"
-version = "0.1.19"
+version = "0.1.20"
 description = "This MCP server provides a set of tools that support AI-driven Development workflows."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -27,7 +27,6 @@ dependencies = [
     "mss>=10.0.0",
     "pygetwindow>=0.0.9",
     "pyobjc-framework-Quartz>=11.0",
-    "Pillow>=11.2.0",
 ]
 
 [tool.hatch.build.targets.wheel]

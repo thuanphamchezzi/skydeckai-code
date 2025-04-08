@@ -581,4 +581,4 @@ Currently in active development. Features and API may change.
 
 Apache License 2.0 - see [LICENSE](LICENSE)
 
-[![Star History Chart](https://api.star-history.com/svg?repos=skydeckai/mcp-server-aidd&type=Date)](https://star-history.com/#skydeckai/mcp-server-aidd&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=skydeckai/mcp-server-aidd&type=Date)](https://www.star-history.com/#skydeckai/mcp-server-aidd&Date)

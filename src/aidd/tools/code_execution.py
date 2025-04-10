@@ -50,6 +50,13 @@ def execute_code_tool() -> Dict[str, Any]:
         "name": "execute_code",
         "description": (
             "Execute arbitrary code in various programming languages on the user's local machine within the current working directory. "
+            "WHEN TO USE: When you need to run small code snippets to test functionality, compute values, process data, or "
+            "demonstrate how code works. Useful for quick prototyping, data transformations, or explaining programming concepts with running "
+            "examples. "
+            "WHEN NOT TO USE: When you need to modify files (use write_file or edit_file instead), when running potentially harmful "
+            "operations, or when you need to install external dependencies. "
+            "RETURNS: Text output including stdout, stderr, and exit code of the "
+            "execution. The output sections are clearly labeled with '=== stdout ===' and '=== stderr ==='. "
             "Supported languages: " + ", ".join(LANGUAGE_CONFIGS.keys()) + ". "
             "Always review the code carefully before execution to prevent unintended consequences. "
             "Examples: "
@@ -63,15 +70,20 @@ def execute_code_tool() -> Dict[str, Any]:
                 "language": {
                     "type": "string",
                     "enum": list(LANGUAGE_CONFIGS.keys()),
-                    "description": "Programming language to use"
+                    "description": "Programming language to use. Must be one of the supported languages: " + ", ".join(LANGUAGE_CONFIGS.keys()) + ". " +
+                    "Each language requires the appropriate runtime to be installed on the user's machine. The code will be executed using: python3 for " +
+                    "Python, node for JavaScript, ruby for Ruby, php for PHP, go run for Go, and rustc for Rust."
                 },
                 "code": {
                     "type": "string",
-                    "description": "Code to execute on the user's local machine in the current working directory"
+                    "description": "Code to execute on the user's local machine in the current working directory. The code will be saved to a " +
+                    "temporary file and executed within the allowed workspace. For Go and Rust, main function wrappers will be added automatically if " +
+                    "not present. For PHP, <?php will be prepended if not present."
                 },
                 "timeout": {
                     "type": "integer",
-                    "description": "Maximum execution time in seconds",
+                    "description": "Maximum execution time in seconds. The execution will be terminated if it exceeds this time limit, returning a " +
+                    "timeout message. Must be between 1 and 30 seconds.",
                     "default": 5,
                     "minimum": 1,
                     "maximum": 30
@@ -86,6 +98,12 @@ def execute_shell_script_tool() -> Dict[str, Any]:
         "name": "execute_shell_script",
         "description": (
             "Execute a shell script (bash/sh) on the user's local machine within the current working directory. "
+            "WHEN TO USE: When you need to automate system tasks, run shell commands, interact with the operating system, or perform operations "
+            "that are best expressed as shell commands. Useful for file system operations, system configuration, or running system utilities. "
+            "WHEN NOT TO USE: When you need more structured programming (use execute_code instead), when you need to execute potentially "
+            "dangerous system operations, or when you want to run commands outside the allowed directory. "
+            "RETURNS: Text output including stdout, stderr, and exit code of the execution. The output sections are clearly labeled with "
+            "'=== stdout ===' and '=== stderr ==='. "
             "This tool can execute shell commands and scripts for system automation and management tasks. "
             "It is designed to perform tasks on the user's local environment, such as opening applications, installing packages and more. "
             "Always review the script carefully before execution to prevent unintended consequences. "
@@ -98,12 +116,15 @@ def execute_shell_script_tool() -> Dict[str, Any]:
             "properties": {
                 "script": {
                     "type": "string",
-                    "description": "Shell script to execute on the user's local machine"
+                    "description": "Shell script to execute on the user's local machine. Can include any valid shell commands or scripts that would "
+                    "run in a standard shell environment. The script is executed using /bin/sh for maximum compatibility across systems."
                 },
                 "timeout": {
                     "type": "integer",
-                    "description": "Maximum execution time in seconds (default: 300, max: 600)",
-                    "default": 300
+                    "description": "Maximum execution time in seconds. The execution will be terminated if it exceeds this time limit. "
+                    "Default is 300 seconds (5 minutes), with a maximum allowed value of 600 seconds (10 minutes).",
+                    "default": 300,
+                    "maximum": 600
                 }
             },
             "required": ["script"]

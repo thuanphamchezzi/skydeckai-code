@@ -13,10 +13,18 @@ from .state import state
 def get_system_info_tool():
     return {
         "name": "get_system_info",
-        "description": "Get detailed system information including OS, CPU, memory, disk, hardware information, and network details (such as WiFi network name). "
-                    "This tool provides comprehensive information about the system environment. "
-                    "Also returns the current working directory (allowed directory) of the AiDD MCP server. "
-                    "Useful for system analysis, debugging, environment verification, and workspace management.",
+        "description": "Get detailed system information about the host computer. "
+                    "WHEN TO USE: When you need to understand the system environment, diagnose performance issues, "
+                    "verify hardware specifications, check resource availability, or determine the operating environment "
+                    "for compatibility reasons. Useful for system analysis, troubleshooting, environment verification, "
+                    "and providing context-aware assistance. "
+                    "WHEN NOT TO USE: When you only need the current working directory (use get_allowed_directory instead), "
+                    "when specific file information is needed (use get_file_info instead), or when you need to interact "
+                    "with applications rather than system information (use get_active_apps instead). "
+                    "RETURNS: A JSON object containing comprehensive system details including: working directory path, "
+                    "OS details (name, version, architecture), Python version, WiFi network name, CPU information "
+                    "(cores, usage), memory statistics (total, available, usage percentage), disk information "
+                    "(total, free, usage percentage), and on macOS, additional hardware details (model, chip, serial number).",
         "inputSchema": {
             "type": "object",
             "properties": {},

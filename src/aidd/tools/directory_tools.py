@@ -10,24 +10,27 @@ from .state import state
 
 def list_directory_tool():
     return {
-        "name": "list_directory",
-        "description": "Get a detailed listing of files and directories in the specified path. "
-                    "This tool is essential for understanding directory structure and finding specific files within a directory. "
-                    "Only works within the allowed directory. "
-                    "Example: Enter 'src' to list contents of the src directory, or '.' for current directory.",
+        "name": "directory_listing",
+        "description": "Get a detailed listing of files and directories in the specified path, including type, size, and modification "
+                    "date. WHEN TO USE: When you need to explore the contents of a directory, understand what files are available, check file sizes or "
+                    "modification dates, or locate specific files by name. WHEN NOT TO USE: When you need to read the contents of files (use read_file "
+                    "instead), when you need a recursive listing of all subdirectories (use directory_tree instead), or when searching for files by name pattern "
+                    "(use search_files instead). RETURNS: Text with each line containing file type ([DIR]/[FILE]), name, size (in B/KB/MB), and "
+                    "modification date. Only works within the allowed directory. Example: Enter 'src' to list contents of the src directory, or '.' for "
+                    "current directory.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "path": {
                     "type": "string",
-                    "description": "Path of the directory to list",
+                    "description": "Path of the directory to list. Examples: '.' for current directory, 'src' for src directory, 'docs/images' for a nested directory. The path must be within the allowed workspace.",
                 }
             },
             "required": ["path"]
         },
     }
 
-async def handle_list_directory(arguments: dict):
+async def handle_directory_listing(arguments: dict):
     from mcp.types import TextContent
 
     path = arguments.get("path", ".")
@@ -79,8 +82,10 @@ def create_directory_tool():
         "name": "create_directory",
         "description": "Create a new directory or ensure a directory exists. "
                     "Can create multiple nested directories in one operation. "
-                    "If the directory already exists, this operation will succeed silently. "
-                    "Useful for setting up project structure or organizing files. "
+                    "WHEN TO USE: When you need to set up project structure, organize files, create output directories before saving files, or establish a directory hierarchy. "
+                    "WHEN NOT TO USE: When you only want to check if a directory exists (use get_file_info instead), or when trying to create directories outside the allowed workspace. "
+                    "RETURNS: Text message confirming either that the directory was successfully created or that it already exists. "
+                    "The operation succeeds silently if the directory already exists. "
                     "Only works within the allowed directory. "
                     "Example: Enter 'src/components' to create nested directories.",
         "inputSchema": {
@@ -88,7 +93,7 @@ def create_directory_tool():
             "properties": {
                 "path": {
                     "type": "string",
-                    "description": "Path of the directory to create"
+                    "description": "Path of the directory to create. Can include nested directories which will all be created. Examples: 'logs' for a simple directory, 'src/components/buttons' for nested directories. Both absolute and relative paths are supported, but must be within the allowed workspace."
                 }
             },
             "required": ["path"]
@@ -137,17 +142,20 @@ def directory_tree_tool():
     return {
         "name": "directory_tree",
         "description": "Get a recursive tree view of files and directories in the specified path as a JSON structure. "
-                    "Each entry includes 'name', 'type' (file/directory), and 'children' for directories. "
+                    "WHEN TO USE: When you need to understand the complete structure of a directory tree, visualize the hierarchy of files and directories, or get a comprehensive overview of a project's organization. "
+                    "Particularly useful for large projects where you need to see nested relationships. "
+                    "WHEN NOT TO USE: When you only need a flat list of files in a single directory (use directory_listing instead), or when you're only interested in specific file types (use search_files instead). "
+                    "RETURNS: JSON structure where each entry includes 'name', 'type' (file/directory), and 'children' for directories. "
                     "Files have no children array, while directories always have a children array (which may be empty). "
-                    "The output is formatted with 2-space indentation for readability. Only works within the allowed directory. "
-                    "Useful for understanding project structure. "
+                    "The output is formatted with 2-space indentation for readability. For Git repositories, shows tracked files only. "
+                    "Only works within the allowed directory. "
                     "Example: Enter '.' for current directory, or 'src' for a specific directory.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "path": {
                     "type": "string",
-                    "description": "Root directory to analyze"
+                    "description": "Root directory to analyze. This is the starting point for the recursive tree generation. Examples: '.' for current directory, 'src' for the src directory. Both absolute and relative paths are supported, but must be within the allowed workspace."
                 }
             },
             "required": ["path"]

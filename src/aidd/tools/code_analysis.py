@@ -56,18 +56,25 @@ except Exception as e:
 
 def tree_sitter_map_tool():
     return {
-        "name": "tree_sitter_map",
-        "description": "Build a tree-sitter based structural map of source code files. "
+        "name": "codebase_mapper",
+        "description": "Build a structural map of source code files in a directory. "
                     "This tool analyzes code structure to identify classes, functions, and methods. "
-                    "Only analyzes files within the allowed directory. "
-                    "Useful for code analysis and understanding project structure. "
+                    "WHEN TO USE: When you need to understand the structure of a codebase, discover classes and "
+                    "functions across multiple files, identify inheritance relationships, or get a high-level overview of code organization without "
+                    "reading every file individually. "
+                    "WHEN NOT TO USE: When you need to search for specific text patterns (use search_files instead), when you "
+                    "need to analyze a single known file (use read_file instead), or when you're working with non-code files. "
+                    "SUPPORTED LANGUAGES: Python (.py), JavaScript (.js/.jsx), TypeScript (.ts/.tsx), Java (.java), C++ (.cpp), Ruby (.rb), Go (.go), Rust (.rs), PHP (.php), "
+                    "C# (.cs), Kotlin (.kt). "
+                    "RETURNS: A text-based tree structure showing classes and functions in the codebase, along with statistics "
+                    "about found elements. Only analyzes files within the allowed directory. "
                     "Example: Enter '.' to analyze all source files in current directory, or 'src' to analyze all files in the src directory.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "path": {
                     "type": "string",
-                    "description": "Root directory to analyze"
+                    "description": "Root directory to analyze. Examples: '.' for current directory, 'src' for src directory, 'lib/components' for a specific subdirectory. The path must point to a directory within the allowed workspace."
                 }
             },
             "required": ["path"]
@@ -359,8 +366,8 @@ def _analyze_file(file_path: str) -> Dict[str, Any]:
             'error': f'Error analyzing file: {str(e)}'
         }
 
-async def handle_tree_sitter_map(arguments: dict):
-    """Handle building a tree-sitter map of source code."""
+async def handle_codebase_mapper(arguments: dict):
+    """Handle building a structural map of source code."""
     from mcp.types import TextContent
 
     path = arguments.get("path", ".")

@@ -12,4 +12,4 @@ startCommand:
   commandFunction:
     # A function that produces the CLI command to start the MCP on stdio.
     |-
-    (config) => ({ command: 'aidd-cli', args: ['--tool', 'get_system_info'], env: config ? { ALLOWED_DIRECTORY: config.allowedDirectory } : undefined })
+    (config) => ({ command: 'skydeckai-code-cli', args: ['--tool', 'get_system_info'], env: config ? { ALLOWED_DIRECTORY: config.allowedDirectory } : undefined })

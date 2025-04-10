@@ -9,7 +9,7 @@ from mcp.types import TextContent
 # Global state management
 class GlobalState:
     def __init__(self):
-        self.config_dir = Path.home() / '.aidd'
+        self.config_dir = Path.home() / '.skydeckai-code'
         self.config_file = self.config_dir / 'config.json'
         self._ensure_config_dir()
 

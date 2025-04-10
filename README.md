@@ -1,5 +1,5 @@
-# AiDD MCP Server
-[![smithery badge](https://smithery.ai/badge/mcp-server-aidd)](https://smithery.ai/server/mcp-server-aidd)
+# SkyDeckAI Code
+[![smithery badge](https://smithery.ai/badge/skydeckai-code)](https://smithery.ai/server/skydeckai-code)
 
 An MCP server that provides a comprehensive set of tools for AI-driven development workflows. Features include file system operations, code analysis using tree-sitter for multiple programming languages, Git operations, code execution, and system information retrieval. Designed to enhance AI's capability to assist in software development tasks.
 
@@ -9,22 +9,22 @@ An MCP server that provides a comprehensive set of tools for AI-driven developme
 
 ### Installing via Smithery
 
-To install AiDD for Claude Desktop automatically via [Smithery](https://smithery.ai/server/mcp-server-aidd):
+To install SkyDeckAI Code for Claude Desktop automatically via [Smithery](https://smithery.ai/server/skydeckai-code):
 
 ```bash
-npx -y @smithery/cli install mcp-server-aidd --client claude
+npx -y @smithery/cli install skydeckai-code --client claude
 ```
 
 ### Manual Installation
 ```bash
 # Using mcp-get
-npx @michaellatman/mcp-get@latest install mcp-server-aidd
+npx @michaellatman/mcp-get@latest install skydeckai-code
 
 # Using pip
-pip install mcp-server-aidd
+pip install skydeckai-code
 
 # Using uv
-uvx mcp-server-aidd
+uvx skydeckai-code
 ```
 
 ## Claude Desktop Setup
@@ -34,9 +34,9 @@ Add to your `claude_desktop_config.json`:
 ```json
 {
     "mcpServers": {
-        "aidd-ai-software-development-utilities": {
+        "skydeckai-code": {
             "command": "uvx",
-            "args": ["mcp-server-aidd"]
+            "args": ["skydeckai-code-cli", "--tool", "get_system_info"]
         }
     }
 }
@@ -44,9 +44,9 @@ Add to your `claude_desktop_config.json`:
 
 ## SkyDeck AI Helper App
 
-If you're using SkyDeck AI Helper app, you can search for "AiDD" and install the mcp-server-aidd.
+If you're using SkyDeck AI Helper app, you can search for "SkyDeckAI Code" and install it.
 
-![SkyDeck AI Helper App](/screenshots/mcp_server_aidd_skydeck_ai_helper.png)
+![SkyDeck AI Helper App](/screenshots/skydeckai_code_helper.png)
 
 ## Key Features
 
@@ -581,4 +581,4 @@ Currently in active development. Features and API may change.
 
 Apache License 2.0 - see [LICENSE](LICENSE)
 
-[![Star History Chart](https://api.star-history.com/svg?repos=skydeckai/mcp-server-aidd&type=Date)](https://www.star-history.com/#skydeckai/mcp-server-aidd&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=skydeckai/skydeckai-code&type=Date)](https://www.star-history.com/#skydeckai/skydeckai-code&Date)

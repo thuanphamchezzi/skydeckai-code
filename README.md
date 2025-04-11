@@ -80,13 +80,13 @@ Common usage:
 
 ```bash
 # Read file
-aidd-cli --tool read_file --args '{"path": "src/main.py"}'
+skydeckai-code-cli --tool read_file --args '{"path": "src/main.py"}'
 
 # Write file
-aidd-cli --tool write_file --args '{"path": "output.txt", "content": "Hello World"}'
+skydeckai-code-cli --tool write_file --args '{"path": "output.txt", "content": "Hello World"}'
 
 # Get file info
-aidd-cli --tool get_file_info --args '{"path": "src/main.py"}'
+skydeckai-code-cli --tool get_file_info --args '{"path": "src/main.py"}'
 ```
 
 ### Complex File Operations
@@ -142,10 +142,10 @@ Common usage:
 
 ```bash
 # List directory
-aidd-cli --tool list_directory --args '{"path": "."}'
+skydeckai-code-cli --tool list_directory --args '{"path": "."}'
 
 # Search for Python files
-aidd-cli --tool search_files --args '{"pattern": ".py", "path": "src"}'
+skydeckai-code-cli --tool search_files --args '{"pattern": ".py", "path": "src"}'
 ```
 
 ### Git Operations
@@ -197,10 +197,10 @@ Common usage:
 
 ```bash
 # Check status
-aidd-cli --tool git_status --args '{"repo_path": "."}'
+skydeckai-code-cli --tool git_status --args '{"repo_path": "."}'
 
 # Create and switch to new branch
-aidd-cli --tool git_create_branch --args '{"repo_path": ".", "branch_name": "feature/new-branch"}'
+skydeckai-code-cli --tool git_create_branch --args '{"repo_path": ".", "branch_name": "feature/new-branch"}'
 ```
 
 ### Code Analysis
@@ -269,7 +269,7 @@ Provides essential system information in a clean, readable format.
 
 ```bash
 # Get system information
-aidd-cli --tool get_system_info
+skydeckai-code-cli --tool get_system_info
 ```
 
 ### Screen Context and Image Tools
@@ -437,25 +437,25 @@ Executes code in various programming languages with safety measures and restrict
 
 ```bash
 # Python example
-aidd-cli --tool execute_code --args '{
+skydeckai-code-cli --tool execute_code --args '{
     "language": "python",
     "code": "print(sum(range(10)))"
 }'
 
 # JavaScript example
-aidd-cli --tool execute_code --args '{
+skydeckai-code-cli --tool execute_code --args '{
     "language": "javascript",
     "code": "console.log(Array.from({length: 5}, (_, i) => i*2))"
 }'
 
 # Ruby example
-aidd-cli --tool execute_code --args '{
+skydeckai-code-cli --tool execute_code --args '{
     "language": "ruby",
     "code": "puts (1..5).reduce(:+)"
 }'
 
 # Go example
-aidd-cli --tool execute_code --args '{
+skydeckai-code-cli --tool execute_code --args '{
     "language": "go",
     "code": "fmt.Println(\"Hello, Go!\")"
 }'
@@ -497,17 +497,17 @@ Executes shell scripts (bash/sh) with safety measures and restrictions.
 
 ```bash
 # List directory contents with details
-aidd-cli --tool execute_shell_script --args '{
+skydeckai-code-cli --tool execute_shell_script --args '{
     "script": "ls -la"
 }'
 
 # Find all Python files recursively
-aidd-cli --tool execute_shell_script --args '{
+skydeckai-code-cli --tool execute_shell_script --args '{
     "script": "find . -name \"*.py\" -type f"
 }'
 
 # Complex script with multiple commands
-aidd-cli --tool execute_shell_script --args '{
+skydeckai-code-cli --tool execute_shell_script --args '{
     "script": "echo \"System Info:\" && uname -a && echo \"\nDisk Usage:\" && df -h"
 }'
 ```
@@ -543,13 +543,13 @@ Configuration file: `~/.aidd/config.json`
 Basic command structure:
 
 ```bash
-aidd-cli --tool <tool_name> --args '<json_arguments>'
+skydeckai-code-cli --tool <tool_name> --args '<json_arguments>'
 
 # List available tools
-aidd-cli --list-tools
+skydeckai-code-cli --list-tools
 
 # Enable debug output
-aidd-cli --debug --tool <tool_name> --args '<json_arguments>'
+skydeckai-code-cli --debug --tool <tool_name> --args '<json_arguments>'
 ```
 
 ## Debugging

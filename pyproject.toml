@@ -1,12 +1,12 @@
 [project]
 name = "skydeckai-code"
-version = "0.1.22"
+version = "0.1.23"
 description = "This MCP server provides a set of tools that support AI-driven Development workflows."
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [{name = "SkyDeck.ai", email = "support@skydeck.ai"}]
-license = {text = "MIT"}
-keywords = ["mcp", "development", "ai", "aidd", "code-analysis"]
+license = {text = "Apache 2.0"}
+keywords = ["mcp", "development", "ai", "aidd", "code-analysis", "code"]
 
 dependencies = [
     "mcp>=1.6.0",
@@ -61,7 +61,5 @@ build-backend = "hatchling.build"
 
 [project.scripts]
 skydeckai-code = "aidd:main"
-aidd = "aidd:main"
-aidd-cli = "aidd.cli:main"
 skydeckai-code-cli = "aidd.cli:main"
 

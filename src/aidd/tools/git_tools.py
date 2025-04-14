@@ -33,9 +33,7 @@ def git_init_tool():
                     "WHEN TO USE: When you need to set up version control for a project, "
                     "start tracking files with Git, or begin a new Git-based workflow. "
                     "Useful for new projects or for adding version control to existing code. "
-                    "WHEN NOT TO USE: When a Git repository already exists in the target location, "
-                    "when working with code that should not be tracked, or when you need to clone "
-                    "an existing repository instead (there is no git_clone tool yet). "
+                    "WHEN NOT TO USE: When a Git repository already exists in the target location. "
                     "RETURNS: A confirmation message indicating that the Git repository was initialized "
                     "successfully, including the path and initial branch name. If the specified directory "
                     "doesn't exist, it will be created automatically. Directory must be within the allowed workspace.",
@@ -235,8 +233,7 @@ def git_add_tool():
                     "WHEN TO USE: When you want to prepare modified files for commit, select specific files to include "
                     "in the next commit, or track new files in the repository. This is typically the first step in the "
                     "commit workflow after making changes. "
-                    "WHEN NOT TO USE: When you want to immediately commit all changes without staging (there is no git_commit_all "
-                    "tool yet), when you want to undo staging (use git_reset instead), or when there are no changes to stage. "
+                    "WHEN NOT TO USE: When you want to undo staging (use git_reset instead), or when there are no changes to stage. "
                     "RETURNS: A confirmation message listing the files that were successfully staged for commit. "
                     "Repository must be within the allowed directory.",
         "inputSchema": {
@@ -347,8 +344,7 @@ def git_create_branch_tool():
                 "branch_name": {
                     "type": "string",
                     "description": "Name of the new branch to create. Should follow git branch naming conventions. "
-                                   "Examples: 'feature/user-auth', 'bugfix/login-issue', 'release/1.0.0'. The branch name "
-                                   "must not already exist in the repository."
+                                   "Examples: 'feature/user-auth', 'bugfix/login-issue', 'release/1.0.0'."
                 },
                 "base_branch": {
                     "type": "string",

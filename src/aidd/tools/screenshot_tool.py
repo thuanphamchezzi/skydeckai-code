@@ -108,12 +108,13 @@ def capture_screenshot_tool():
     return {
         "name": "capture_screenshot",
         "description": "Capture a screenshot of the current screen and save it to a file. "
+                      "This tool allows capturing the entire screen, the active window, or a specific named window. "
+                      "The screenshot will be saved to the specified output path or to a default location if not provided. "
                       "WHEN TO USE: When you need to visually document what's on screen, capture a specific application "
                       "window, create visual references for troubleshooting, or gather visual information about the user's "
                       "environment. Useful for documenting issues, creating tutorials, or assisting with visual tasks. "
                       "WHEN NOT TO USE: When you need information about windows without capturing them (use get_available_windows "
-                      "instead), when working with highly sensitive information that shouldn't be captured, or on systems "
-                      "where screen recording permissions haven't been granted. "
+                      "instead). "
                       "RETURNS: A JSON object containing success status, file path where the screenshot was saved, and a "
                       "message. On failure, includes a detailed error message. If debug mode is enabled, also includes debug "
                       "information about the attempted capture. Windows can be captured in the background without bringing "
@@ -123,15 +124,13 @@ def capture_screenshot_tool():
             "properties": {
                 "output_path": {
                     "type": "string",
-                    "description": "Optional path where the screenshot should be saved. If not provided, a default path in the "
-                                   "'screenshots' directory within the allowed workspace will be used, with a timestamp-based "
-                                   "filename. Examples: 'screenshots/main_window.png', 'docs/current_state.png'. Both absolute "
+                    "description": "Optional path where the screenshot should be saved. If not provided, a default path will be used."
+                                   "Examples: 'screenshots/main_window.png', 'docs/current_state.png'. Both absolute "
                                    "and relative paths are supported, but must be within the allowed workspace."
                 },
                 "capture_mode": {
                     "type": "object",
-                    "description": "Specifies what to capture in the screenshot. This object controls the capture behavior and "
-                                   "must include a 'type' field and may require additional fields depending on the type.",
+                    "description": "Specifies what to capture in the screenshot.",
                     "properties": {
                         "type": {
                             "type": "string",

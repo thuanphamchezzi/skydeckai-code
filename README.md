@@ -1,11 +1,10 @@
 # SkyDeckAI Code
-[![smithery badge](https://smithery.ai/badge/skydeckai-code)](https://smithery.ai/server/skydeckai-code)
 
-An MCP server that provides a comprehensive set of tools for AI-driven development workflows. Features include file system operations, code analysis using tree-sitter for multiple programming languages, Git operations, code execution, and system information retrieval. Designed to enhance AI's capability to assist in software development tasks. 
+An MCP server that provides a comprehensive set of tools for AI-driven development workflows. Features include file system operations, code analysis using tree-sitter for multiple programming languages, Git operations, code execution, and system information retrieval. Designed to enhance AI's capability to assist in software development tasks.
 
 # Formerly Known As MCP-Server-AIDD
 
-This is the mcp-server app formerly known as mcp-server-aidd. It was renamed skydeckai-code to credit the team at [SkyDeck.ai](https://skydeck.ai) with creating this application along with [East Agile](https://eastagile.com). But more importantly we realized that the term AI Driven Development (AIDD) was just not catching on. People did not understand at a glance what it was about. And nor did LLMs. "Code" was far more intuitive. And linguistically intuitive is important in the world of agentic AI.  
+This mcp server app was formerly known as `mcp-server-aidd`. It was renamed to `skydeckai-code` to credit the team at [SkyDeck.ai](https://skydeck.ai) with creating this application along with [East Agile](https://eastagile.com). But more importantly we realized that the term AI Driven Development (AIDD) was just not catching on. People did not understand at a glance what it was about. And nor did LLMs. "Code" was far more intuitive. And linguistically intuitive is important in the world of agentic AI.
 
 <a href="https://glama.ai/mcp/servers/mpixtij6se"><img width="380" height="200" src="https://glama.ai/mcp/servers/mpixtij6se/badge" alt="AiDD Server MCP server" /></a>
 
@@ -16,19 +15,23 @@ This is the mcp-server app formerly known as mcp-server-aidd. It was renamed sky
 To install SkyDeckAI Code for Claude Desktop automatically via [Smithery](https://smithery.ai/server/skydeckai-code):
 
 ```bash
-npx -y @smithery/cli install skydeckai-code --client claude
+npx -y @smithery/cli install @skydeck/skydeckai-code --client claude
+```
+
+### Installing via McpGet
+
+```bash
+npx @michaellatman/mcp-get@latest install @skydeck/skydeckai-code
 ```
 
 ### Manual Installation
-```bash
-# Using mcp-get
-npx @michaellatman/mcp-get@latest install skydeckai-code
 
+```bash
 # Using pip
-pip install skydeckai-code
+pip install @skydeck/skydeckai-code
 
 # Using uv
-uvx skydeckai-code
+uvx @skydeck/skydeckai-code
 ```
 
 ## Claude Desktop Setup
@@ -40,7 +43,7 @@ Add to your `claude_desktop_config.json`:
     "mcpServers": {
         "skydeckai-code": {
             "command": "uvx",
-            "args": ["skydeckai-code-cli", "--tool", "get_system_info"]
+            "args": ["skydeckai-code"]
         }
     }
 }
@@ -50,7 +53,7 @@ Add to your `claude_desktop_config.json`:
 
 If you're using SkyDeck AI Helper app, you can search for "SkyDeckAI Code" and install it.
 
-![SkyDeck AI Helper App](/screenshots/skydeckai_code_helper.png)
+![SkyDeck AI Helper App](/screenshots/skydeck_ai_helper.png)
 
 ## Key Features
 
@@ -530,7 +533,7 @@ This tool executes arbitrary shell commands on your system. Always:
 
 ## Configuration
 
-Configuration file: `~/.aidd/config.json`
+Configuration file: `~/.skydeckai_code/config.json`
 
 ```json
 {

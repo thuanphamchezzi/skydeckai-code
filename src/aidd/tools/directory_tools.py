@@ -10,7 +10,7 @@ from .state import state
 
 def list_directory_tool():
     return {
-        "name": "directory_listing",
+        "name": "list_directory",
         "description": "Get a detailed listing of files and directories in the specified path, including type, size, and modification "
                     "date. WHEN TO USE: When you need to explore the contents of a directory, understand what files are available, check file sizes or "
                     "modification dates, or locate specific files by name. WHEN NOT TO USE: When you need to read the contents of files (use read_file "
@@ -30,7 +30,7 @@ def list_directory_tool():
         },
     }
 
-async def handle_directory_listing(arguments: dict):
+async def handle_list_directory(arguments: dict):
     from mcp.types import TextContent
 
     path = arguments.get("path", ".")

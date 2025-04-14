@@ -54,7 +54,7 @@ try:
 except Exception as e:
     raise RuntimeError(f"Failed to initialize languages: {e}")
 
-def tree_sitter_map_tool():
+def codebase_mapper_tool():
     return {
         "name": "codebase_mapper",
         "description": "Build a structural map of source code files in a directory. "

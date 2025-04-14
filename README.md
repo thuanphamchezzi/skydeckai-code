@@ -4,7 +4,7 @@ An MCP server that provides a comprehensive set of tools for AI-driven developme
 
 # Formerly Known As MCP-Server-AIDD
 
-This mcp server app was formerly known as `mcp-server-aidd`. It was renamed to `skydeckai-code` to credit the team at [SkyDeck.ai](https://skydeck.ai) with creating this application along with [East Agile](https://eastagile.com). But more importantly we realized that the term AI Driven Development (AIDD) was just not catching on. People did not understand at a glance what it was about. And nor did LLMs. "Code" was far more intuitive. And linguistically intuitive is important in the world of agentic AI.
+This mcp server was formerly known as `mcp-server-aidd`. It was renamed to `skydeckai-code` to credit the team at [SkyDeck.ai](https://skydeck.ai) with creating this application along with [East Agile](https://eastagile.com). But more importantly we realized that the term AI Driven Development (AIDD) was just not catching on. People did not understand at a glance what it was about. And nor did LLMs. "Code" was far more intuitive. And linguistically intuitive is important in the world of agentic AI.
 
 <a href="https://glama.ai/mcp/servers/mpixtij6se"><img width="380" height="200" src="https://glama.ai/mcp/servers/mpixtij6se/badge" alt="AiDD Server MCP server" /></a>
 
@@ -153,13 +153,17 @@ skydeckai-code-cli --tool search_files --args '{"pattern": ".py", "path": "src"}
 
 ### Git Operations
 
-| Tool         | Parameters                             | Returns                          |
-| ------------ | -------------------------------------- | -------------------------------- |
-| git_init     | path: string, initial_branch?: string  | Repository initialization status |
-| git_status   | repo_path: string                      | Working directory status         |
-| git_add      | repo_path: string, files: string[]     | Staging confirmation             |
-| git_reset    | repo_path: string                      | Unstaging confirmation           |
-| git_checkout | repo_path: string, branch_name: string | Branch switch confirmation       |
+| Tool              | Parameters                             | Returns                          |
+| ----------------- | -------------------------------------- | -------------------------------- |
+| git_init          | path: string, initial_branch?: string  | Repository initialization status |
+| git_status        | repo_path: string                      | Working directory status         |
+| git_add           | repo_path: string, files: string[]     | Staging confirmation             |
+| git_reset         | repo_path: string                      | Unstaging confirmation           |
+| git_checkout      | repo_path: string, branch_name: string | Branch switch confirmation       |
+| git_create_branch | repo_path: string, branch_name: string | Branch creation confirmation     |
+| git_diff_unstaged | repo_path: string                      | Unstaged changes diff            |
+| git_diff_staged   | repo_path: string                      | Staged changes diff              |
+| git_show          | repo_path: string, commit_hash: string | Details of a specific commit     |
 
 #### Complex Git Operations
 
@@ -183,7 +187,7 @@ Returns: Commit hash and confirmation.
 }
 ```
 
-Returns: Detailed diff output.
+Returns: Detailed diff output showing all changes between the current branch and the specified target branch or commit.
 
 ##### git_log
 
@@ -208,7 +212,7 @@ skydeckai-code-cli --tool git_create_branch --args '{"repo_path": ".", "branch_n
 
 ### Code Analysis
 
-#### tree_sitter_map
+#### codebase_mapper
 
 Analyzes source code structure:
 

@@ -1,4 +1,4 @@
-from .code_analysis import handle_tree_sitter_map, tree_sitter_map_tool
+from .code_analysis import handle_codebase_mapper, codebase_mapper_tool
 from .code_execution import (
     execute_code_tool,
     execute_shell_script_tool,
@@ -89,7 +89,7 @@ TOOL_DEFINITIONS = [
     directory_tree_tool(),
     execute_code_tool(),
     execute_shell_script_tool(),
-    tree_sitter_map_tool(),
+    codebase_mapper_tool(),
     # Git tools
     git_init_tool(),
     git_status_tool(),
@@ -130,7 +130,7 @@ TOOL_HANDLERS = {
     "directory_tree": handle_directory_tree,
     "execute_code": handle_execute_code,
     "execute_shell_script": handle_execute_shell_script,
-    "tree_sitter_map": handle_tree_sitter_map,
+    "codebase_mapper": handle_codebase_mapper,
     # Git handlers
     "git_init": handle_git_init,
     "git_status": handle_git_status,

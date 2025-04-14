@@ -19,4 +19,4 @@ RUN pip install .
 # EXPOSE 8000
 
 # Define the entry point for the container
-CMD ["aidd-cli", "--tool", "get_system_info"]
+CMD ["skydeckai-code-cli", "--tool", "get_system_info"]

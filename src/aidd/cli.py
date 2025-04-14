@@ -1,4 +1,4 @@
-"""Command-line interface for the AIDD MCP server."""
+"""Command-line interface for the SkyDeckAI Code MCP server."""
 
 import argparse
 import asyncio
@@ -14,7 +14,7 @@ from mcp.types import CallToolResult, TextContent
 
 
 class MCPClient:
-    """Client for interacting with the AIDD MCP server."""
+    """Client for interacting with the SkyDeckAI Code MCP server."""
 
     def __init__(self):
         """Initialize the client."""
@@ -23,8 +23,8 @@ class MCPClient:
         self.debug = False
 
     async def connect(self):
-        """Connect to the AIDD server."""
-        server_params = StdioServerParameters(command="mcp-server-aidd", args=[], env=None)
+        """Connect to the SkyDeckAI Code server."""
+        server_params = StdioServerParameters(command="skydeckai-code", args=[], env=None)
         transport = await self.exit_stack.enter_async_context(stdio_client(server_params))
         self.session = await self.exit_stack.enter_async_context(ClientSession(*transport))
         await self.session.initialize()
@@ -88,24 +88,24 @@ class MCPClient:
 def main():
     """Main entry point for the CLI."""
     parser = argparse.ArgumentParser(
-        description="CLI for the AIDD MCP server",
+        description="CLI for the SkyDeckAI Code MCP server",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   # List all available tools
-  aidd-cli --list-tools
+  skydeckai-code-cli --list-tools
 
   # List directory contents
-  aidd-cli --tool list_directory --args '{"path": "."}'
+  skydeckai-code-cli --tool list_directory --args '{"path": "."}'
 
   # Update allowed directory
-  aidd-cli --tool update_allowed_directory --args '{"directory": "~/Code/project"}'
+  skydeckai-code-cli --tool update_allowed_directory --args '{"directory": "~/Code/project"}'
 
   # Read a file
-  aidd-cli --tool read_file --args '{"path": "README.md"}'
+  skydeckai-code-cli --tool read_file --args '{"path": "README.md"}'
 
   # Enable debug output
-  aidd-cli --debug --tool read_file --args '{"path": "README.md"}'""")
+  skydeckai-code-cli --debug --tool read_file --args '{"path": "README.md"}'""")
     parser.add_argument("--list-tools", action="store_true", help="List available tools")
     parser.add_argument("--tool", help="Tool to call")
     parser.add_argument("--args", help='Tool arguments in JSON format (e.g. \'{"directory":"/path/to/dir"}\')')

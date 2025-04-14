@@ -16,16 +16,19 @@ def read_file_tool():
     return {
         "name": "read_file",
         "description": "Read the complete contents of a file from the file system. "
-                    "Handles various text encodings and provides detailed error messages "
-                    "if the file cannot be read. Use this tool when you need to examine "
-                    "the contents of a single file. Only works within the allowed directory."
+                    "WHEN TO USE: When you need to examine the actual content of a single file, view source code, check configuration files, or analyze text data. "
+                    "This is the primary tool for accessing file contents directly. "
+                    "WHEN NOT TO USE: When you only need file metadata like size or modification date (use get_file_info instead), when you need to list directory contents "
+                    "(use directory_listing instead), or when you need to read multiple files at once (use read_multiple_files instead). "
+                    "RETURNS: The complete text content of the specified file. Binary files or files with unknown encodings will return an error message. "
+                    "Handles various text encodings and provides detailed error messages if the file cannot be read. Only works within the allowed directory. "
                     "Example: Enter 'src/main.py' to read a Python file.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "path": {
                     "type": "string",
-                    "description": "Path to the file to read",
+                    "description": "Path to the file to read. This must be a path to a file, not a directory. Examples: 'README.md', 'src/main.py', 'config.json'. Both absolute and relative paths are supported, but must be within the allowed workspace.",
                 }
             },
             "required": ["path"]
@@ -36,20 +39,24 @@ def write_file_tool():
     return {
         "name": "write_file",
         "description": "Create a new file or overwrite an existing file with new content. "
-                    "Use this to save changes, create new files, or update existing ones. "
-                    "Use with caution as it will overwrite existing files without warning. "
-                    "Path must be relative to the allowed directory. Creates parent directories if needed. "
+                    "WHEN TO USE: When you need to save changes, create new files, or update existing ones with new content. "
+                    "Useful for generating reports, creating configuration files, or saving edited content. "
+                    "WHEN NOT TO USE: When you want to make targeted edits to parts of a file while preserving the rest (use edit_file instead), "
+                    "when you need to append to a file without overwriting existing content, or when you need to preserve the original file. "
+                    "RETURNS: A confirmation message indicating that the file was successfully written. "
+                    "Creates parent directories automatically if they don't exist. "
+                    "Use with caution as it will overwrite existing files without warning. Only works within the allowed directory. "
                     "Example: Path='notes.txt', Content='Meeting notes for project X'",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "path": {
                     "type": "string",
-                    "description": "Path where to write the file"
+                    "description": "Path where to write the file. Both absolute and relative paths are supported, but must be within the allowed workspace. Examples: 'README.md', 'logs/debug.log', 'reports/report.txt'. Parent directories will be created automatically if they don't exist."
                 },
                 "content": {
                     "type": "string",
-                    "description": "Content to write to the file"
+                    "description": "Content to write to the file. The complete text content that should be saved to the file. This will completely replace any existing content if the file already exists."
                 }
             },
             "required": ["path", "content"]
@@ -60,21 +67,24 @@ def move_file_tool():
     return {
         "name": "move_file",
         "description": "Move or rename a file or directory to a new location. "
-                    "This tool can be used to reorganize files and directories. "
+                    "WHEN TO USE: When you need to reorganize files or directories, rename files or folders, or move items to a different location within the allowed workspace. "
+                    "Useful for organizing project files, restructuring directories, or for simple renaming operations. "
+                    "WHEN NOT TO USE: When you want to copy a file while keeping the original (copying functionality is not available in this tool set), "
+                    "when destination already exists (the operation will fail), or when either source or destination is outside the allowed workspace. "
+                    "RETURNS: A confirmation message indicating that the file or directory was successfully moved. "
+                    "Parent directories of the destination will be created automatically if they don't exist. "
                     "Both source and destination must be within the allowed directory. "
-                    "If the destination already exists, the operation will fail. "
-                    "Parent directories of the destination will be created if they don't exist. "
                     "Example: source='old.txt', destination='new/path/new.txt'",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "source": {
                     "type": "string",
-                    "description": "Source path of the file or directory to move"
+                    "description": "Source path of the file or directory to move. This file or directory must exist. Both absolute and relative paths are supported, but must be within the allowed workspace. Examples: 'document.txt', 'src/utils.js', 'config/old-settings/'"
                 },
                 "destination": {
                     "type": "string",
-                    "description": "Destination path where to move the file or directory"
+                    "description": "Destination path where to move the file or directory. If this path already exists, the operation will fail. Parent directories will be created automatically if they don't exist. Both absolute and relative paths are supported, but must be within the allowed workspace. Examples: 'renamed.txt', 'backup/document.txt', 'src/new-location/'"
                 }
             },
             "required": ["source", "destination"]
@@ -84,28 +94,30 @@ def move_file_tool():
 def search_files_tool():
     return {
         "name": "search_files",
-        "description": "Search for files and directories matching a pattern. "
-                    "The search is recursive and case-insensitive. "
-                    "Only searches within the allowed directory. "
-                    "Returns paths relative to the allowed directory. "
-                    "Searches in file and directory names, not content. "
-                    "For searching within file contents, use the tree_sitter_map tool which can locate specific code elements like functions and classes. "
-                    "Example: pattern='.py' finds all Python files, "
-                    "pattern='test' finds all items with 'test' in the name.",
+        "description": "Search for files and directories matching a pattern in their names. "
+                    "WHEN TO USE: When you need to find files or directories by name pattern across a directory tree, locate files with specific extensions, "
+                    "or find items containing certain text in their names. Useful for locating configuration files, finding all files of a certain type, "
+                    "or gathering files related to a specific feature. "
+                    "WHEN NOT TO USE: When searching for content within files (there is no grep tool in this application), when you need a flat listing of a single directory "
+                    "(use directory_listing instead), or when you need to analyze code structure (use codebase_mapper instead). "
+                    "RETURNS: A list of matching files and directories with their types ([FILE] or [DIR]) and relative paths. "
+                    "For Git repositories, only shows tracked files and directories by default. "
+                    "The search is recursive and case-insensitive. Only searches within the allowed directory. "
+                    "Example: pattern='.py' finds all Python files, pattern='test' finds all items with 'test' in the name.",
         "inputSchema": {
             "type": "object",
             "properties": {
-                "path": {
-                    "type": "string",
-                    "description": "Starting directory for the search (defaults to allowed directory)"
-                },
                 "pattern": {
                     "type": "string",
-                    "description": "Pattern to search for in file and directory names"
+                    "description": "Pattern to search for in file and directory names. The search is case-insensitive and matches substrings. Examples: '.js' to find all JavaScript files, 'test' to find all items containing 'test' in their name, 'config' to find configuration files and directories."
+                },
+                "path": {
+                    "type": "string",
+                    "description": "Starting directory for the search (defaults to allowed directory). This is the root directory from which the recursive search begins. Examples: '.' for current directory, 'src' to search only in the src directory tree. Both absolute and relative paths are supported, but must be within the allowed workspace."
                 },
                 "include_hidden": {
                     "type": "boolean",
-                    "description": "Whether to include hidden files and directories (defaults to false)"
+                    "description": "Whether to include hidden files and directories (defaults to false). On Unix-like systems, hidden items start with a dot (.). Set to true to include them in the search results."
                 }
             },
             "required": ["pattern"]
@@ -116,10 +128,10 @@ def get_file_info_tool():
     return {
         "name": "get_file_info",
         "description": "Get detailed information about a file or directory. "
-                    "Returns size, creation time, modification time, access time, "
-                    "type (file/directory), and permissions. "
-                    "All times are in ISO 8601 format. "
-                    "This tool is perfect for understanding file characteristics without reading the actual content. "
+                    "WHEN TO USE: When you need to check file metadata like size, timestamps, permissions, or file type without reading the contents. "
+                    "Useful for determining when files were modified, checking file sizes, verifying file existence, or distinguishing between files and directories. "
+                    "WHEN NOT TO USE: When you need to read the actual content of a file (use read_file instead), or when you need to list all files in a directory (use directory_listing instead). "
+                    "RETURNS: Text with information about the file or directory including type (file/directory), size in bytes, creation time, modification time, access time (all in ISO 8601 format), and permissions. "
                     "Only works within the allowed directory. "
                     "Example: path='src/main.py' returns details about main.py",
         "inputSchema": {
@@ -127,7 +139,7 @@ def get_file_info_tool():
             "properties": {
                 "path": {
                     "type": "string",
-                    "description": "Path to the file or directory"
+                    "description": "Path to the file or directory to get information about. Can be either a file or directory path. Examples: 'README.md', 'src/components', 'package.json'. Both absolute and relative paths are supported, but must be within the allowed workspace."
                 }
             },
             "required": ["path"]
@@ -138,16 +150,20 @@ def delete_file_tool():
     return {
         "name": "delete_file",
         "description": "Delete a file or empty directory from the file system. "
-                    "Use with caution as this operation cannot be undone. "
+                    "WHEN TO USE: When you need to remove unwanted files, clean up temporary files, or delete empty directories. "
+                    "Useful for cleaning up workspaces, removing intermediate build artifacts, or deleting temporary files. "
+                    "WHEN NOT TO USE: When you need to delete non-empty directories (the operation will fail), when you want to move files instead of deleting them (use move_file instead), "
+                    "or when you need to preserve the file for later use. "
+                    "RETURNS: A confirmation message indicating that the file or empty directory was successfully deleted. "
                     "For safety, this tool will not delete non-empty directories. "
-                    "Only works within the allowed directory. "
+                    "Use with caution as this operation cannot be undone. Only works within the allowed directory. "
                     "Example: path='old_file.txt' removes the specified file.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "path": {
                     "type": "string",
-                    "description": "Path to the file or empty directory to delete"
+                    "description": "Path to the file or empty directory to delete. For directories, they must be completely empty or the operation will fail. Examples: 'temp.txt', 'build/cache.json', 'empty-dir/'. Both absolute and relative paths are supported, but must be within the allowed workspace."
                 }
             },
             "required": ["path"]
@@ -158,10 +174,13 @@ def read_multiple_files_tool():
     return {
         "name": "read_multiple_files",
         "description": "Read the contents of multiple files simultaneously. "
-                    "This is more efficient than reading files one by one when you need to analyze "
-                    "or compare multiple files. Each file's content is returned with its "
-                    "path as a reference. Failed reads for individual files won't stop "
-                    "the entire operation. Only works within the allowed directory."
+                    "WHEN TO USE: When you need to examine or compare multiple files at once, analyze related files together, or gather content from several files efficiently. "
+                    "Useful for understanding code across multiple files, comparing configuration files, or collecting information from related documents. "
+                    "WHEN NOT TO USE: When you only need to read a single file (use read_file instead), when you need to read binary files or images (use read_image_file instead), "
+                    "or when you need metadata about files rather than their contents (use get_file_info instead). "
+                    "RETURNS: The contents of all specified files, with each file's content preceded by a header showing its path (==> path/to/file <==). "
+                    "If an individual file cannot be read, an error message is included in its place, but the operation continues for other files. "
+                    "Failed reads for individual files won't stop the entire operation. Only works within the allowed directory. "
                     "Example: Enter ['src/main.py', 'README.md'] to read both files.",
         "inputSchema": {
             "type": "object",
@@ -169,7 +188,7 @@ def read_multiple_files_tool():
                 "paths": {
                     "type": "array",
                     "items": {"type": "string"},
-                    "description": "List of file paths to read",
+                    "description": "List of file paths to read. Must contain at least one path. Each path should point to a text file. Examples: ['README.md', 'package.json'], ['src/main.py', 'src/utils.py', 'config.ini']. Both absolute and relative paths are supported, but must be within the allowed workspace.",
                 }
             },
             "required": ["paths"]
@@ -179,16 +198,20 @@ def read_multiple_files_tool():
 def edit_file_tool():
     return {
         "name": "edit_file",
-        "description": "Make line-based edits to a text file. Each edit replaces exact line sequences "
-            "with new content. Returns a git-style diff showing the changes made. "
-            "Only works within the allowed directory. "
-            "Always use dryRun first to preview changes before applying them.",
+        "description": "Make line-based edits to a text file. "
+            "WHEN TO USE: When you need to make selective changes to specific parts of a file while preserving the rest of the content. "
+            "Useful for modifying configuration values, updating text while maintaining file structure, or making targeted code changes. "
+            "WHEN NOT TO USE: When you want to completely replace a file's contents (use write_file instead), when you need to create a new file (use write_file instead), "
+            "or when you want to apply highly complex edits with context. "
+            "RETURNS: A git-style diff showing the changes made, along with information about any failed matches. "
+            "The response includes sections for failed matches (if any) and the unified diff output. "
+            "Always use dryRun first to preview changes before applying them. Only works within the allowed directory.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "path": {
                     "type": "string",
-                    "description": "File to edit"
+                    "description": "File to edit. Must be a text file that exists within the allowed workspace. Examples: 'README.md', 'src/config.js', 'settings.json'. Both absolute and relative paths are supported, but must be within the allowed workspace."
                 },
                 "edits": {
                     "type": "array",
@@ -197,20 +220,20 @@ def edit_file_tool():
                         "properties": {
                             "oldText": {
                                 "type": "string",
-                                "description": "Text to search for (can be substring)"
+                                "description": "Text to search for in the file. This should be a unique segment of text to identify where the change should be made. Include enough context (lines before/after) to ensure the right match is found."
                             },
                             "newText": {
                                 "type": "string",
-                                "description": "Text to replace with"
+                                "description": "Text to replace the matched section with. This will completely replace the oldText section. To delete text, use an empty string."
                             }
                         },
                         "required": ["oldText", "newText"]
                     },
-                    "description": "List of edit operations"
+                    "description": "List of edit operations to perform on the file. Each edit specifies text to find (oldText) and text to replace it with (newText). The edits are applied in sequence, and each one can modify the result of previous edits."
                 },
                 "dryRun": {
                     "type": "boolean",
-                    "description": "Preview changes without applying",
+                    "description": "Preview changes without applying them to the file. Set to true to see what changes would be made without actually modifying the file. Highly recommended before making actual changes.",
                     "default": False
                 },
                 "options": {
@@ -218,17 +241,17 @@ def edit_file_tool():
                     "properties": {
                         "preserveIndentation": {
                             "type": "boolean",
-                            "description": "Keep existing indentation",
+                            "description": "Keep existing indentation when replacing text. When true, the indentation of the first line of oldText is preserved in newText.",
                             "default": True
                         },
                         "normalizeWhitespace": {
                             "type": "boolean",
-                            "description": "Normalize spaces while preserving structure",
+                            "description": "Normalize spaces while preserving structure. When true, consecutive spaces are treated as a single space during matching, making the search more forgiving of whitespace differences.",
                             "default": True
                         },
                         "partialMatch": {
                             "type": "boolean",
-                            "description": "Enable fuzzy matching",
+                            "description": "Enable fuzzy matching for finding text. When true, the tool will try to find the best match even if it's not an exact match, using a confidence threshold of 80%.",
                             "default": True
                         }
                     }

@@ -7,7 +7,7 @@ from mcp.server.models import InitializationOptions
 
 from .tools import TOOL_DEFINITIONS, TOOL_HANDLERS
 
-server = Server("aidd")
+server = Server("skydeckai-code")
 
 @server.list_tools()
 async def handle_list_tools() -> list[types.Tool]:
@@ -40,7 +40,7 @@ async def main():
             read_stream,
             write_stream,
             InitializationOptions(
-                server_name="aidd",
+                server_name="skydeckai-code",
                 server_version="0.1.0",
                 capabilities=server.get_capabilities(
                     notification_options=NotificationOptions(),

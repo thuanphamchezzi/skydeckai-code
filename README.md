@@ -1,7 +1,10 @@
-# AiDD MCP Server
-[![smithery badge](https://smithery.ai/badge/mcp-server-aidd)](https://smithery.ai/server/mcp-server-aidd)
+# SkyDeckAI Code
 
 An MCP server that provides a comprehensive set of tools for AI-driven development workflows. Features include file system operations, code analysis using tree-sitter for multiple programming languages, Git operations, code execution, and system information retrieval. Designed to enhance AI's capability to assist in software development tasks.
+
+# Formerly Known As MCP-Server-AIDD
+
+This mcp server was formerly known as `mcp-server-aidd`. It was renamed to `skydeckai-code` to credit the team at [SkyDeck.ai](https://skydeck.ai) with creating this application along with [East Agile](https://eastagile.com). But more importantly we realized that the term AI Driven Development (AIDD) was just not catching on. People did not understand at a glance what it was about. And nor did LLMs. "Code" was far more intuitive. And linguistically intuitive is important in the world of agentic AI.
 
 <a href="https://glama.ai/mcp/servers/mpixtij6se"><img width="380" height="200" src="https://glama.ai/mcp/servers/mpixtij6se/badge" alt="AiDD Server MCP server" /></a>
 
@@ -9,22 +12,26 @@ An MCP server that provides a comprehensive set of tools for AI-driven developme
 
 ### Installing via Smithery
 
-To install AiDD for Claude Desktop automatically via [Smithery](https://smithery.ai/server/mcp-server-aidd):
+To install SkyDeckAI Code for Claude Desktop automatically via [Smithery](https://smithery.ai/server/skydeckai-code):
 
 ```bash
-npx -y @smithery/cli install mcp-server-aidd --client claude
+npx -y @smithery/cli install @skydeck/skydeckai-code --client claude
+```
+
+### Installing via McpGet
+
+```bash
+npx @michaellatman/mcp-get@latest install @skydeck/skydeckai-code
 ```
 
 ### Manual Installation
-```bash
-# Using mcp-get
-npx @michaellatman/mcp-get@latest install mcp-server-aidd
 
+```bash
 # Using pip
-pip install mcp-server-aidd
+pip install @skydeck/skydeckai-code
 
 # Using uv
-uvx mcp-server-aidd
+uvx @skydeck/skydeckai-code
 ```
 
 ## Claude Desktop Setup
@@ -34,9 +41,9 @@ Add to your `claude_desktop_config.json`:
 ```json
 {
     "mcpServers": {
-        "aidd-ai-software-development-utilities": {
+        "skydeckai-code": {
             "command": "uvx",
-            "args": ["mcp-server-aidd"]
+            "args": ["skydeckai-code"]
         }
     }
 }
@@ -44,9 +51,9 @@ Add to your `claude_desktop_config.json`:
 
 ## SkyDeck AI Helper App
 
-If you're using SkyDeck AI Helper app, you can search for "AiDD" and install the mcp-server-aidd.
+If you're using SkyDeck AI Helper app, you can search for "SkyDeckAI Code" and install it.
 
-![SkyDeck AI Helper App](/screenshots/mcp_server_aidd_skydeck_ai_helper.png)
+![SkyDeck AI Helper App](/screenshots/skydeck_ai_helper.png)
 
 ## Key Features
 
@@ -76,13 +83,13 @@ Common usage:
 
 ```bash
 # Read file
-aidd-cli --tool read_file --args '{"path": "src/main.py"}'
+skydeckai-code-cli --tool read_file --args '{"path": "src/main.py"}'
 
 # Write file
-aidd-cli --tool write_file --args '{"path": "output.txt", "content": "Hello World"}'
+skydeckai-code-cli --tool write_file --args '{"path": "output.txt", "content": "Hello World"}'
 
 # Get file info
-aidd-cli --tool get_file_info --args '{"path": "src/main.py"}'
+skydeckai-code-cli --tool get_file_info --args '{"path": "src/main.py"}'
 ```
 
 ### Complex File Operations
@@ -138,21 +145,25 @@ Common usage:
 
 ```bash
 # List directory
-aidd-cli --tool list_directory --args '{"path": "."}'
+skydeckai-code-cli --tool list_directory --args '{"path": "."}'
 
 # Search for Python files
-aidd-cli --tool search_files --args '{"pattern": ".py", "path": "src"}'
+skydeckai-code-cli --tool search_files --args '{"pattern": ".py", "path": "src"}'
 ```
 
 ### Git Operations
 
-| Tool         | Parameters                             | Returns                          |
-| ------------ | -------------------------------------- | -------------------------------- |
-| git_init     | path: string, initial_branch?: string  | Repository initialization status |
-| git_status   | repo_path: string                      | Working directory status         |
-| git_add      | repo_path: string, files: string[]     | Staging confirmation             |
-| git_reset    | repo_path: string                      | Unstaging confirmation           |
-| git_checkout | repo_path: string, branch_name: string | Branch switch confirmation       |
+| Tool              | Parameters                             | Returns                          |
+| ----------------- | -------------------------------------- | -------------------------------- |
+| git_init          | path: string, initial_branch?: string  | Repository initialization status |
+| git_status        | repo_path: string                      | Working directory status         |
+| git_add           | repo_path: string, files: string[]     | Staging confirmation             |
+| git_reset         | repo_path: string                      | Unstaging confirmation           |
+| git_checkout      | repo_path: string, branch_name: string | Branch switch confirmation       |
+| git_create_branch | repo_path: string, branch_name: string | Branch creation confirmation     |
+| git_diff_unstaged | repo_path: string                      | Unstaged changes diff            |
+| git_diff_staged   | repo_path: string                      | Staged changes diff              |
+| git_show          | repo_path: string, commit_hash: string | Details of a specific commit     |
 
 #### Complex Git Operations
 
@@ -176,7 +187,7 @@ Returns: Commit hash and confirmation.
 }
 ```
 
-Returns: Detailed diff output.
+Returns: Detailed diff output showing all changes between the current branch and the specified target branch or commit.
 
 ##### git_log
 
@@ -193,15 +204,15 @@ Common usage:
 
 ```bash
 # Check status
-aidd-cli --tool git_status --args '{"repo_path": "."}'
+skydeckai-code-cli --tool git_status --args '{"repo_path": "."}'
 
 # Create and switch to new branch
-aidd-cli --tool git_create_branch --args '{"repo_path": ".", "branch_name": "feature/new-branch"}'
+skydeckai-code-cli --tool git_create_branch --args '{"repo_path": ".", "branch_name": "feature/new-branch"}'
 ```
 
 ### Code Analysis
 
-#### tree_sitter_map
+#### codebase_mapper
 
 Analyzes source code structure:
 
@@ -265,7 +276,7 @@ Provides essential system information in a clean, readable format.
 
 ```bash
 # Get system information
-aidd-cli --tool get_system_info
+skydeckai-code-cli --tool get_system_info
 ```
 
 ### Screen Context and Image Tools
@@ -433,25 +444,25 @@ Executes code in various programming languages with safety measures and restrict
 
 ```bash
 # Python example
-aidd-cli --tool execute_code --args '{
+skydeckai-code-cli --tool execute_code --args '{
     "language": "python",
     "code": "print(sum(range(10)))"
 }'
 
 # JavaScript example
-aidd-cli --tool execute_code --args '{
+skydeckai-code-cli --tool execute_code --args '{
     "language": "javascript",
     "code": "console.log(Array.from({length: 5}, (_, i) => i*2))"
 }'
 
 # Ruby example
-aidd-cli --tool execute_code --args '{
+skydeckai-code-cli --tool execute_code --args '{
     "language": "ruby",
     "code": "puts (1..5).reduce(:+)"
 }'
 
 # Go example
-aidd-cli --tool execute_code --args '{
+skydeckai-code-cli --tool execute_code --args '{
     "language": "go",
     "code": "fmt.Println(\"Hello, Go!\")"
 }'
@@ -493,17 +504,17 @@ Executes shell scripts (bash/sh) with safety measures and restrictions.
 
 ```bash
 # List directory contents with details
-aidd-cli --tool execute_shell_script --args '{
+skydeckai-code-cli --tool execute_shell_script --args '{
     "script": "ls -la"
 }'
 
 # Find all Python files recursively
-aidd-cli --tool execute_shell_script --args '{
+skydeckai-code-cli --tool execute_shell_script --args '{
     "script": "find . -name \"*.py\" -type f"
 }'
 
 # Complex script with multiple commands
-aidd-cli --tool execute_shell_script --args '{
+skydeckai-code-cli --tool execute_shell_script --args '{
     "script": "echo \"System Info:\" && uname -a && echo \"\nDisk Usage:\" && df -h"
 }'
 ```
@@ -526,7 +537,7 @@ This tool executes arbitrary shell commands on your system. Always:
 
 ## Configuration
 
-Configuration file: `~/.aidd/config.json`
+Configuration file: `~/.skydeckai_code/config.json`
 
 ```json
 {
@@ -539,13 +550,13 @@ Configuration file: `~/.aidd/config.json`
 Basic command structure:
 
 ```bash
-aidd-cli --tool <tool_name> --args '<json_arguments>'
+skydeckai-code-cli --tool <tool_name> --args '<json_arguments>'
 
 # List available tools
-aidd-cli --list-tools
+skydeckai-code-cli --list-tools
 
 # Enable debug output
-aidd-cli --debug --tool <tool_name> --args '<json_arguments>'
+skydeckai-code-cli --debug --tool <tool_name> --args '<json_arguments>'
 ```
 
 ## Debugging
@@ -581,4 +592,4 @@ Currently in active development. Features and API may change.
 
 Apache License 2.0 - see [LICENSE](LICENSE)
 
-[![Star History Chart](https://api.star-history.com/svg?repos=skydeckai/mcp-server-aidd&type=Date)](https://www.star-history.com/#skydeckai/mcp-server-aidd&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=skydeckai/skydeckai-code&type=Date)](https://www.star-history.com/#skydeckai/skydeckai-code&Date)

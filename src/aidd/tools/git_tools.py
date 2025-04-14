@@ -30,19 +30,27 @@ def git_init_tool():
     return {
         "name": "git_init",
         "description": "Initialize a new Git repository. "
-                    "Creates a new Git repository in the specified directory. "
-                    "If the directory doesn't exist, it will be created. "
-                    "Directory must be within the allowed directory.",
+                    "WHEN TO USE: When you need to set up version control for a project, "
+                    "start tracking files with Git, or begin a new Git-based workflow. "
+                    "Useful for new projects or for adding version control to existing code. "
+                    "WHEN NOT TO USE: When a Git repository already exists in the target location. "
+                    "RETURNS: A confirmation message indicating that the Git repository was initialized "
+                    "successfully, including the path and initial branch name. If the specified directory "
+                    "doesn't exist, it will be created automatically. Directory must be within the allowed workspace.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "path": {
                     "type": "string",
-                    "description": "Path where to initialize the repository"
+                    "description": "Path where to initialize the repository. This will be the root directory of the Git "
+                                   "repository. Examples: '.', 'my-project', 'src/module'. Both absolute and relative "
+                                   "paths are supported, but must be within the allowed workspace."
                 },
                 "initial_branch": {
                     "type": "string",
-                    "description": "Name of the initial branch (defaults to 'main')",
+                    "description": "Name of the initial branch to create. Common values are 'main' (modern default) or "
+                                   "'master' (legacy default). Examples: 'main', 'develop', 'trunk'. If not specified, "
+                                   "'main' will be used.",
                     "default": "main"
                 }
             },
@@ -74,14 +82,23 @@ def git_status_tool():
     return {
         "name": "git_status",
         "description": "Shows the working tree status of a git repository. "
-                    "Returns information about staged, unstaged, and untracked files. "
-                    "Repository must be within the allowed directory.",
+                    "WHEN TO USE: When you need to check what files have been modified, added, or deleted in a repository, "
+                    "understand the current state of the working directory, or determine which files are staged for commit. "
+                    "Useful before committing changes, when troubleshooting repository state, or for confirming which "
+                    "files have been modified. "
+                    "WHEN NOT TO USE: When you need to see the actual content changes (use git_diff_unstaged or git_diff_staged instead), "
+                    "when you need to view commit history (use git_log instead), or when you need information about a specific "
+                    "commit (use git_show instead). "
+                    "RETURNS: Text output showing the current branch, tracking information, and status of all files in the "
+                    "repository, including staged, unstaged, and untracked files. Repository must be within the allowed directory.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "repo_path": {
                     "type": "string",
-                    "description": "Path to git repository"
+                    "description": "Path to git repository. This must be a directory containing a valid Git repository. "
+                                   "Examples: '.', 'my-project', '/absolute/path/to/repo'. Both absolute and relative paths "
+                                   "are supported, but must be within the allowed workspace."
                 }
             },
             "required": ["repo_path"]
@@ -92,14 +109,23 @@ def git_diff_unstaged_tool():
     return {
         "name": "git_diff_unstaged",
         "description": "Shows changes in working directory not yet staged for commit. "
-                    "Returns a unified diff format of all unstaged changes. "
-                    "Repository must be within the allowed directory.",
+                    "WHEN TO USE: When you need to see the exact content changes that have been made to files but not yet "
+                    "added to the staging area. Useful for reviewing modifications before staging them, understanding what "
+                    "changes have been made since the last commit, or inspecting file differences in detail. "
+                    "WHEN NOT TO USE: When you only need to know which files have been modified without seeing the changes "
+                    "(use git_status instead), when you want to see changes that are already staged (use git_diff_staged instead), "
+                    "or when you want to compare with a specific branch (use git_diff instead). "
+                    "RETURNS: A unified diff output showing the exact changes made to files that have not yet been staged, "
+                    "including added, deleted, and modified lines with proper context. If no unstaged changes exist, it will "
+                    "indicate that. Repository must be within the allowed directory.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "repo_path": {
                     "type": "string",
-                    "description": "Path to git repository"
+                    "description": "Path to git repository. This must be a directory containing a valid Git repository. "
+                                   "Examples: '.', 'my-project', '/absolute/path/to/repo'. Both absolute and relative paths "
+                                   "are supported, but must be within the allowed workspace."
                 }
             },
             "required": ["repo_path"]
@@ -110,14 +136,23 @@ def git_diff_staged_tool():
     return {
         "name": "git_diff_staged",
         "description": "Shows changes staged for commit. "
-                    "Returns a unified diff format of all staged changes. "
+                    "WHEN TO USE: When you need to see the exact content changes that have been added to the staging area "
+                    "and are ready to be committed. Useful for reviewing modifications before committing them, verifying "
+                    "that the right changes are staged, or inspecting file differences in detail. "
+                    "WHEN NOT TO USE: When you only need to know which files are staged without seeing the changes "
+                    "(use git_status instead), when you want to see changes that are not yet staged (use git_diff_unstaged instead), "
+                    "or when you want to compare with a specific branch (use git_diff instead). "
+                    "RETURNS: A unified diff output showing the exact changes that have been staged, including added, "
+                    "deleted, and modified lines with proper context. If no staged changes exist, it will indicate that. "
                     "Repository must be within the allowed directory.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "repo_path": {
                     "type": "string",
-                    "description": "Path to git repository"
+                    "description": "Path to git repository. This must be a directory containing a valid Git repository. "
+                                   "Examples: '.', 'my-project', '/absolute/path/to/repo'. Both absolute and relative paths "
+                                   "are supported, but must be within the allowed workspace."
                 }
             },
             "required": ["repo_path"]
@@ -128,18 +163,30 @@ def git_diff_tool():
     return {
         "name": "git_diff",
         "description": "Shows differences between branches or commits. "
-                    "Returns a unified diff format comparing current state with target. "
-                    "Repository must be within the allowed directory.",
+                    "WHEN TO USE: When you need to compare the current branch with another branch or commit, "
+                    "see what changes were made in a specific branch, or analyze differences between different "
+                    "versions of the code. Useful for code reviews, understanding changes between versions, or "
+                    "preparing for merges. "
+                    "WHEN NOT TO USE: When you want to see only unstaged changes (use git_diff_unstaged instead), "
+                    "when you want to see only staged changes (use git_diff_staged instead), or when you just need "
+                    "a list of changed files without content details (use git_status instead). "
+                    "RETURNS: A unified diff output showing the exact differences between the current branch and "
+                    "the specified target branch or commit, including added, deleted, and modified lines with proper "
+                    "context. If no differences exist, it will indicate that. Repository must be within the allowed directory.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "repo_path": {
                     "type": "string",
-                    "description": "Path to git repository"
+                    "description": "Path to git repository. This must be a directory containing a valid Git repository. "
+                                   "Examples: '.', 'my-project', '/absolute/path/to/repo'. Both absolute and relative paths "
+                                   "are supported, but must be within the allowed workspace."
                 },
                 "target": {
                     "type": "string",
-                    "description": "Target branch or commit to compare with"
+                    "description": "Target branch or commit to compare with the current branch. This can be a branch name, "
+                                   "commit hash, or reference like HEAD~1. Examples: 'main', 'develop', 'feature/new-feature', "
+                                   "'a1b2c3d' (commit hash)."
                 }
             },
             "required": ["repo_path", "target"]
@@ -149,19 +196,30 @@ def git_diff_tool():
 def git_commit_tool():
     return {
         "name": "git_commit",
-        "description": "Records changes to the repository. "
-                    "Commits all staged changes with the provided message. "
+        "description": "Records changes to the repository by creating a new commit. "
+                    "WHEN TO USE: When you have staged changes that you want to permanently record in the repository history, "
+                    "after using git_add to stage your changes, or when you've completed a logical unit of work that should "
+                    "be captured. Useful after reviewing staged changes with git_diff_staged and confirming they're ready to commit. "
+                    "WHEN NOT TO USE: When you haven't staged any changes yet (use git_add first), when you want to see what "
+                    "changes would be committed (use git_diff_staged instead), or when you want to undo staged changes "
+                    "(use git_reset instead). "
+                    "RETURNS: A confirmation message with the commit hash if successful, or a message indicating that there "
+                    "are no changes staged for commit. For new repositories without commits, checks if there are staged files. "
                     "Repository must be within the allowed directory.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "repo_path": {
                     "type": "string",
-                    "description": "Path to git repository"
+                    "description": "Path to git repository. This must be a directory containing a valid Git repository. "
+                                   "Examples: '.', 'my-project', '/absolute/path/to/repo'. Both absolute and relative paths "
+                                   "are supported, but must be within the allowed workspace."
                 },
                 "message": {
                     "type": "string",
-                    "description": "Commit message"
+                    "description": "Commit message that describes the changes being committed. This message will be permanently "
+                                   "recorded in the repository history and should clearly describe what changes were made and why. "
+                                   "Examples: 'Fix bug in login function', 'Add pagination to user list', 'Update documentation for API endpoints'."
                 }
             },
             "required": ["repo_path", "message"]
@@ -172,19 +230,28 @@ def git_add_tool():
     return {
         "name": "git_add",
         "description": "Adds file contents to the staging area. "
-                    "Stages specified files for the next commit. "
+                    "WHEN TO USE: When you want to prepare modified files for commit, select specific files to include "
+                    "in the next commit, or track new files in the repository. This is typically the first step in the "
+                    "commit workflow after making changes. "
+                    "WHEN NOT TO USE: When you want to undo staging (use git_reset instead), or when there are no changes to stage. "
+                    "RETURNS: A confirmation message listing the files that were successfully staged for commit. "
                     "Repository must be within the allowed directory.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "repo_path": {
                     "type": "string",
-                    "description": "Path to git repository"
+                    "description": "Path to git repository. This must be a directory containing a valid Git repository. "
+                                   "Examples: '.', 'my-project', '/absolute/path/to/repo'. Both absolute and relative paths "
+                                   "are supported, but must be within the allowed workspace."
                 },
                 "files": {
                     "type": "array",
                     "items": {"type": "string"},
-                    "description": "List of file paths to stage"
+                    "description": "List of file paths to stage for the next commit. These paths should be relative to the "
+                                   "repository root. Can include specific files, directories, or patterns. "
+                                   "Examples: ['README.md'], ['src/main.py', 'docs/index.html'], ['*.js'] to stage all "
+                                   "JavaScript files in the current directory."
                 }
             },
             "required": ["repo_path", "files"]
@@ -195,14 +262,22 @@ def git_reset_tool():
     return {
         "name": "git_reset",
         "description": "Unstages all staged changes. "
-                    "Removes all files from the staging area. "
+                    "WHEN TO USE: When you want to undo staging operations, remove files from the staging area without "
+                    "losing changes, or start over with your staging selections. Useful when you accidentally staged files "
+                    "that shouldn't be committed or need to reorganize what will be included in the next commit. "
+                    "WHEN NOT TO USE: When you want to keep some staged changes (this tool unstages everything), when you "
+                    "want to discard changes completely (not just unstage them), or when you need to modify commit history. "
+                    "RETURNS: A confirmation message indicating that all changes have been successfully unstaged. For new "
+                    "repositories without commits, it removes all files from the index. "
                     "Repository must be within the allowed directory.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "repo_path": {
                     "type": "string",
-                    "description": "Path to git repository"
+                    "description": "Path to git repository. This must be a directory containing a valid Git repository. "
+                                   "Examples: '.', 'my-project', '/absolute/path/to/repo'. Both absolute and relative paths "
+                                   "are supported, but must be within the allowed workspace."
                 }
             },
             "required": ["repo_path"]
@@ -213,18 +288,29 @@ def git_log_tool():
     return {
         "name": "git_log",
         "description": "Shows the commit logs. "
-                    "Returns information about recent commits including hash, author, date, and message. "
+                    "WHEN TO USE: When you need to view the commit history of a repository, check who made specific changes, "
+                    "understand the evolution of a project over time, or find a specific commit by its description. Useful "
+                    "for investigating the project history, finding when features were added, or understanding code changes. "
+                    "WHEN NOT TO USE: When you need to see the actual changes in a commit (use git_show instead), when you "
+                    "need to compare branches (use git_diff instead), or when you just want to know the current repository "
+                    "status (use git_status instead). "
+                    "RETURNS: Text output listing commit history with details for each commit including hash, author, date, "
+                    "and commit message. For new repositories, indicates that no commits exist yet. "
                     "Repository must be within the allowed directory.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "repo_path": {
                     "type": "string",
-                    "description": "Path to git repository"
+                    "description": "Path to git repository. This must be a directory containing a valid Git repository. "
+                                   "Examples: '.', 'my-project', '/absolute/path/to/repo'. Both absolute and relative paths "
+                                   "are supported, but must be within the allowed workspace."
                 },
                 "max_count": {
                     "type": "integer",
-                    "description": "Maximum number of commits to show",
+                    "description": "Maximum number of commits to show in the history. This limits the output to the most "
+                                   "recent N commits. Examples: 5 to show the last five commits, 20 to show more history. "
+                                   "Higher values may result in longer output. If not specified, defaults to 10.",
                     "default": 10
                 }
             },
@@ -235,23 +321,36 @@ def git_log_tool():
 def git_create_branch_tool():
     return {
         "name": "git_create_branch",
-        "description": "Creates a new branch. "
-                    "Creates a new branch from the specified base branch or current HEAD. "
+        "description": "Creates a new branch in a git repository. "
+                    "WHEN TO USE: When you need to start working on a new feature, create an isolated environment for "
+                    "development, branch off from the main codebase, or prepare for a pull request. Useful for implementing "
+                    "features without affecting the main codebase, fixing bugs in isolation, or managing parallel development "
+                    "workflows. "
+                    "WHEN NOT TO USE: When the repository has no commits yet (make an initial commit first), when you just "
+                    "want to switch to an existing branch (use git_checkout instead), or when you want to see differences "
+                    "between branches (use git_diff instead). "
+                    "RETURNS: A confirmation message indicating that the branch was successfully created and which branch "
+                    "it was created from. Requires that the repository has at least one commit. "
                     "Repository must be within the allowed directory.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "repo_path": {
                     "type": "string",
-                    "description": "Path to git repository"
+                    "description": "Path to git repository. This must be a directory containing a valid Git repository. "
+                                   "Examples: '.', 'my-project', '/absolute/path/to/repo'. Both absolute and relative paths "
+                                   "are supported, but must be within the allowed workspace."
                 },
                 "branch_name": {
                     "type": "string",
-                    "description": "Name of the new branch"
+                    "description": "Name of the new branch to create. Should follow git branch naming conventions. "
+                                   "Examples: 'feature/user-auth', 'bugfix/login-issue', 'release/1.0.0'."
                 },
                 "base_branch": {
                     "type": "string",
-                    "description": "Starting point for the new branch (optional)",
+                    "description": "Starting point for the new branch. This can be a branch name, tag, or commit hash from "
+                                   "which the new branch will be created. If not specified, the current active branch is "
+                                   "used as the base. Examples: 'main', 'develop', 'v1.0' (tag), 'a1b2c3d' (commit hash).",
                     "default": None
                 }
             },
@@ -262,19 +361,30 @@ def git_create_branch_tool():
 def git_checkout_tool():
     return {
         "name": "git_checkout",
-        "description": "Switches branches. "
-                    "Checks out the specified branch. "
+        "description": "Switches branches in a git repository. "
+                    "WHEN TO USE: When you need to switch your working directory to a different branch, view or work on "
+                    "code from another branch, or prepare for merging branches. Useful for moving between feature branches, "
+                    "switching to the main branch to pull updates, or starting work on a different task. "
+                    "WHEN NOT TO USE: When the repository has no commits yet (make an initial commit first), when you want "
+                    "to create a new branch (use git_create_branch instead), or when you have uncommitted changes that would "
+                    "be overwritten. "
+                    "RETURNS: A confirmation message indicating that the branch was successfully checked out. Requires that "
+                    "the repository has at least one commit and that the specified branch exists. "
                     "Repository must be within the allowed directory.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "repo_path": {
                     "type": "string",
-                    "description": "Path to git repository"
+                    "description": "Path to git repository. This must be a directory containing a valid Git repository. "
+                                   "Examples: '.', 'my-project', '/absolute/path/to/repo'. Both absolute and relative paths "
+                                   "are supported, but must be within the allowed workspace."
                 },
                 "branch_name": {
                     "type": "string",
-                    "description": "Name of branch to checkout"
+                    "description": "Name of branch to checkout. This must be an existing branch in the repository. "
+                                   "Examples: 'main', 'develop', 'feature/user-authentication'. The branch must exist "
+                                   "in the repository or the command will fail."
                 }
             },
             "required": ["repo_path", "branch_name"]
@@ -284,19 +394,30 @@ def git_checkout_tool():
 def git_show_tool():
     return {
         "name": "git_show",
-        "description": "Shows the contents of a commit. "
-                    "Returns detailed information about a specific commit including the changes it introduced. "
-                    "Repository must be within the allowed directory.",
+        "description": "Shows the contents of a specific commit. "
+                    "WHEN TO USE: When you need to examine the exact changes introduced by a particular commit, understand "
+                    "what was modified in a specific revision, or analyze the details of historical changes. Useful for code "
+                    "reviews, understanding the implementation of a feature, or troubleshooting when a bug was introduced. "
+                    "WHEN NOT TO USE: When the repository has no commits yet, when you only need a list of commits without "
+                    "details (use git_log instead), or when you want to compare branches or arbitrary revisions (use "
+                    "git_diff instead). "
+                    "RETURNS: Detailed information about the specified commit including commit hash, author, date, commit message, "
+                    "and a unified diff showing all changes introduced by that commit. For the first commit in a repository, "
+                    "shows the complete file contents. Repository must be within the allowed directory.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "repo_path": {
                     "type": "string",
-                    "description": "Path to git repository"
+                    "description": "Path to git repository. This must be a directory containing a valid Git repository. "
+                                   "Examples: '.', 'my-project', '/absolute/path/to/repo'. Both absolute and relative paths "
+                                   "are supported, but must be within the allowed workspace."
                 },
                 "revision": {
                     "type": "string",
-                    "description": "The revision (commit hash, branch name, tag) to show"
+                    "description": "The revision to show details for. This can be a commit hash (full or abbreviated), branch name, "
+                                   "tag, or reference like HEAD~1. Examples: 'a1b2c3d' (commit hash), 'main' (branch), 'v1.0' (tag), "
+                                   "'HEAD~3' (third commit before current HEAD)."
                 }
             },
             "required": ["repo_path", "revision"]

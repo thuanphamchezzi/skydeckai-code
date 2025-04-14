@@ -70,7 +70,8 @@ ehthumbs.db
 Thumbs.db
 
 # Project specific
-.aidd/
+.skydeckai-code/
 .uv/
 node_modules/
 *.log
+CLAUDE.md

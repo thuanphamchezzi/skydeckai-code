@@ -1,6 +1,6 @@
 # SkyDeckAI Code
 
-An MCP server that provides a comprehensive set of tools for AI-driven development workflows. Features include file system operations, code analysis using tree-sitter for multiple programming languages, Git operations, code execution, web content fetching, code content searching, and system information retrieval. Designed to enhance AI's capability to assist in software development tasks by providing direct access to both local and remote resources.
+An MCP server that provides a comprehensive set of tools for AI-driven development workflows. Features include file system operations, code analysis using tree-sitter for multiple programming languages, Git operations, code execution, web content fetching with HTML-to-markdown conversion, multi-engine web search, code content searching, and system information retrieval. Designed to enhance AI's capability to assist in software development tasks by providing direct access to both local and remote resources.
 
 # Formerly Known As MCP-Server-AIDD
 
@@ -63,7 +63,8 @@ If you're using SkyDeck AI Helper app, you can search for "SkyDeckAI Code" and i
 -   Code content searching with regex pattern matching
 -   Multi-language code execution with safety measures
 -   Git operations (status, diff, commit, branch management, cloning)
--   Web content fetching from APIs and websites
+-   Web content fetching from APIs and websites with HTML-to-markdown conversion
+-   Multi-engine web search with reliable fallback mechanisms
 -   Batch operations for parallel and serial tool execution
 -   Security controls with configurable workspace boundaries
 -   Screenshot and screen context tools
@@ -533,6 +534,53 @@ skydeckai-code-cli --tool web_fetch --args '{
 skydeckai-code-cli --tool web_fetch --args '{
     "url": "https://example.com",
     "convert_html_to_markdown": true
+}'
+```
+
+#### web_search
+
+Performs a robust web search using multiple search engines and returns concise, relevant results.
+
+```json
+{
+    "query": "latest python release features",
+    "num_results": 8,
+    "convert_html_to_markdown": true,
+    "search_engine": "bing"
+}
+```
+
+**Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|---------|----------|---------------------------------------|
+| query | string | Yes | The search query to process. Be specific for better results. |
+| num_results | integer | No | Maximum number of search results to return (default: 10, max: 20) |
+| convert_html_to_markdown | boolean | No | When true, content will be converted from HTML to markdown for better readability (default: true) |
+| search_engine | string | No | Specifies which search engine to use: "auto" (default), "bing", or "duckduckgo" |
+
+**Returns:**
+A list of search results formatted in markdown, including titles, URLs, and snippets for each result. Results are deduplicated and organized hierarchically for easy reading.
+
+This tool uses a multi-engine approach that tries different search engines with various parsing strategies to ensure reliable results. You can specify a preferred engine, but some engines may block automated access, in which case the tool will fall back to alternative engines when "auto" is selected.
+
+**Example Usage:**
+
+```bash
+# Search with default settings (auto engine selection)
+skydeckai-code-cli --tool web_search --args '{
+    "query": "latest python release features"
+}'
+
+# Try DuckDuckGo if you want alternative results
+skydeckai-code-cli --tool web_search --args '{
+    "query": "machine learning frameworks comparison",
+    "search_engine": "duckduckgo"
+}'
+
+# Use Bing for reliable results
+skydeckai-code-cli --tool web_search --args '{
+    "query": "best programming practices 2023",
+    "search_engine": "bing"
 }'
 ```
 

@@ -623,6 +623,40 @@ skydeckai-code-cli --tool batch_tools --args '{
 }'
 ```
 
+#### think
+
+A tool for complex reasoning and brainstorming without making changes to the repository.
+
+```json
+{
+    "thought": "Let me analyze the performance issue in the codebase:\n\n## Root Cause Analysis\n\n1. The database query is inefficient because:\n   - It doesn't use proper indexing\n   - It fetches more columns than needed\n   - The JOIN operation is unnecessarily complex\n\n## Potential Solutions\n\n1. **Add database indexes**:\n   - Create an index on the user_id column\n   - Create a composite index on (created_at, status)\n\n2. **Optimize the query**:\n   - Select only necessary columns\n   - Rewrite the JOIN using a subquery\n   - Add LIMIT clause for pagination\n\n3. **Add caching layer**:\n   - Cache frequent queries using Redis\n   - Implement cache invalidation strategy\n\nAfter weighing the options, solution #2 seems to be the simplest to implement with the highest impact."
+}
+```
+
+**Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|---------|----------|---------------------------------------|
+| thought | string | Yes | Your detailed thoughts, analysis or reasoning process |
+
+**Returns:**
+Your thoughts formatted as markdown, with a note indicating this was a thinking exercise.
+
+This tool is useful for thinking through complex problems, brainstorming solutions, or laying out implementation plans without making any actual changes. It's a great way to document your reasoning process, evaluate different approaches, or plan out a multi-step strategy before taking action.
+
+**Example Usage:**
+
+```bash
+# Analyze a bug and plan a fix
+skydeckai-code-cli --tool think --args '{
+    "thought": "# Bug Analysis\n\n## Observed Behavior\nThe login endpoint returns a 500 error when email contains Unicode characters.\n\n## Root Cause\nThe database adapter is not properly encoding Unicode strings before constructing the SQL query.\n\n## Potential Fixes\n1. Update the database adapter to use parameterized queries\n2. Add input validation to reject Unicode in emails\n3. Encode email input manually before database operations\n\nFix #1 is the best approach as it solves the core issue and improves security."
+}'
+
+# Evaluate design alternatives
+skydeckai-code-cli --tool think --args '{
+    "thought": "# API Design Options\n\n## REST vs GraphQL\nFor this use case, GraphQL would provide more flexible data fetching but adds complexity. REST is simpler and sufficient for our current needs.\n\n## Authentication Methods\nJWT-based authentication offers stateless operation and better scalability compared to session-based auth.\n\nRecommendation: Use REST with JWT authentication for the initial implementation."
+}'
+```
+
 ### Code Execution
 
 #### execute_code

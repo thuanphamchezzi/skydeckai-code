@@ -185,3 +185,54 @@ async def _execute_tool_with_error_handling(handler, arguments, tool_name, index
             "success": False,
             "error": str(e)
         }
+
+
+def think_tool():
+    return {
+        "name": "think",
+        "description": "Use the tool to think about something. "
+                    "WHEN TO USE: When complex reasoning or brainstorming is needed without making any changes to files "
+                    "or retrieving additional information. Useful for analyzing problems, planning approaches, evaluating "
+                    "options, or organizing thoughts before taking action. "
+                    "WHEN NOT TO USE: When immediate action is needed, when you need to query for new information, "
+                    "or when a simple explanation would suffice. "
+                    "RETURNS: The thoughts you provided, formatted as markdown. This tool does not retrieve new information "
+                    "or make any changes to the repository - it simply records your reasoning process for reference. "
+                    "This is particularly valuable when exploring complex bugs, designing architecture, or evaluating "
+                    "multiple approaches to a problem.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "thought": {
+                    "type": "string",
+                    "description": "Your detailed thoughts, analysis, reasoning, or brainstorming. Can include markdown "
+                                   "formatting for better readability, like bullet points, headings, or code blocks. "
+                                   "Examples: Analyzing the root cause of a bug, evaluating different API design choices, "
+                                   "planning refactoring steps, or brainstorming optimization strategies."
+                }
+            },
+            "required": ["thought"]
+        }
+    }
+
+
+async def handle_think(arguments: dict) -> List[TextContent]:
+    """Handle recording a thought without making any changes."""
+    thought = arguments.get("thought")
+
+    if not thought:
+        raise ValueError("Thought must be provided")
+
+    # Format the thought in markdown
+    formatted_thought = f"""# Thought Process
+
+{thought}
+
+---
+*Note: This is a thinking tool used for reasoning and brainstorming. No changes were made to the repository.*
+"""
+
+    return [TextContent(
+        type="text",
+        text=formatted_thought
+    )]

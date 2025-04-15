@@ -77,7 +77,7 @@ from .screenshot_tool import (
     handle_capture_screenshot,
 )
 from .system_tools import get_system_info_tool, handle_get_system_info
-from .web_tools import web_fetch_tool, handle_web_fetch
+from .web_tools import web_fetch_tool, handle_web_fetch, web_search_tool, handle_web_search
 
 # Export all tools definitions
 TOOL_DEFINITIONS = [
@@ -125,6 +125,7 @@ TOOL_DEFINITIONS = [
     read_image_file_tool(),
     # Web tools
     web_fetch_tool(),
+    web_search_tool(),
 ]
 
 # Export all handlers
@@ -173,4 +174,5 @@ TOOL_HANDLERS = {
     "read_image_file": handle_read_image_file,
     # Web handlers
     "web_fetch": handle_web_fetch,
+    "web_search": handle_web_search,
 }

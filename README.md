@@ -75,7 +75,7 @@ If you're using SkyDeck AI Helper app, you can search for "SkyDeckAI Code" and i
 
 | Tool                | Parameters                                               | Returns                                       |
 | ------------------- | -------------------------------------------------------- | --------------------------------------------- |
-| read_file           | path: string                                             | File content                                  |
+| read_file           | path: string, offset?: integer, limit?: integer          | File content (whole or partial)               |
 | read_multiple_files | paths: string[]                                          | Multiple file contents with headers           |
 | write_file          | path: string, content: string                            | Success confirmation                          |
 | move_file           | source: string, destination: string                      | Success confirmation                          |
@@ -86,8 +86,14 @@ If you're using SkyDeck AI Helper app, you can search for "SkyDeckAI Code" and i
 Common usage:
 
 ```bash
-# Read file
+# Read entire file
 skydeckai-code-cli --tool read_file --args '{"path": "src/main.py"}'
+
+# Read 10 lines starting from line 20
+skydeckai-code-cli --tool read_file --args '{"path": "src/main.py", "offset": 20, "limit": 10}'
+
+# Read from line 50 to the end of the file
+skydeckai-code-cli --tool read_file --args '{"path": "src/main.py", "offset": 50}'
 
 # Write file
 skydeckai-code-cli --tool write_file --args '{"path": "output.txt", "content": "Hello World"}'

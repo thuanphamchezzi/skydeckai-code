@@ -17,20 +17,28 @@ from .state import state
 def read_file_tool():
     return {
         "name": "read_file",
-        "description": "Read the complete contents of a file from the file system. "
+        "description": "Read the contents of a file from the file system. "
                     "WHEN TO USE: When you need to examine the actual content of a single file, view source code, check configuration files, or analyze text data. "
                     "This is the primary tool for accessing file contents directly. "
                     "WHEN NOT TO USE: When you only need file metadata like size or modification date (use get_file_info instead), when you need to list directory contents "
                     "(use directory_listing instead), or when you need to read multiple files at once (use read_multiple_files instead). "
-                    "RETURNS: The complete text content of the specified file. Binary files or files with unknown encodings will return an error message. "
+                    "RETURNS: The complete text content of the specified file or the requested portion if offset/limit are specified. Binary files or files with unknown encodings will return an error message. "
                     "Handles various text encodings and provides detailed error messages if the file cannot be read. Only works within the allowed directory. "
-                    "Example: Enter 'src/main.py' to read a Python file.",
+                    "Example: Enter 'src/main.py' to read a Python file, or add offset/limit to read specific line ranges.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "path": {
                     "type": "string",
-                    "description": "Path to the file to read. This must be a path to a file, not a directory. Examples: 'README.md', 'src/main.py', 'config.json'. Both absolute and relative paths are supported, but must be within the allowed workspace.",
+                    "description": "Path to the file to read. This must be a path to a file, not a directory. Examples: 'README.md', 'src/main.py', 'config.json'. Both absolute and relative paths are supported, but must be within the allowed workspace."
+                },
+                "offset": {
+                    "type": "integer",
+                    "description": "Line number to start reading from (1-indexed). If specified, the file will be read starting from this line. Default is to start from the beginning of the file.",
+                },
+                "limit": {
+                    "type": "integer",
+                    "description": "Maximum number of lines to read after the offset. If specified along with offset, only this many lines will be read. Default is to read to the end of the file.",
                 }
             },
             "required": ["path"]
@@ -297,7 +305,7 @@ def edit_file_tool():
         }
     }
 
-async def _read_single_file(path: str) -> List[TextContent]:
+async def _read_single_file(path: str, offset: int = None, limit: int = None) -> List[TextContent]:
     """Helper function to read a single file with proper validation."""
     # Determine full path based on whether input is absolute or relative
     if os.path.isabs(path):
@@ -316,7 +324,40 @@ async def _read_single_file(path: str) -> List[TextContent]:
 
     try:
         with open(full_path, 'r', encoding='utf-8') as f:
-            content = f.read()
+            # If we have offset/limit parameters, read only the specified lines
+            if offset is not None or limit is not None:
+                lines = f.readlines()
+
+                # Determine start line - convert from 1-indexed to 0-indexed
+                start_idx = 0
+                if offset is not None:
+                    start_idx = max(0, offset - 1)  # Convert 1-indexed to 0-indexed
+
+                # Determine end line
+                end_idx = len(lines)
+                if limit is not None:
+                    end_idx = min(len(lines), start_idx + limit)
+
+                # Read only the specified range
+                content = ''.join(lines[start_idx:end_idx])
+
+                # Add summary information about the file before and after the selected range
+                total_lines = len(lines)
+                summary = []
+
+                if start_idx > 0:
+                    summary.append(f"[...{start_idx} lines before...]")
+
+                if end_idx < total_lines:
+                    summary.append(f"[...{total_lines - end_idx} lines after...]")
+
+                if summary:
+                    content = '\n'.join(summary) + '\n' + content
+
+            else:
+                # Read the entire file
+                content = f.read()
+
             return [TextContent(
                 type="text",
                 text=content
@@ -368,7 +409,11 @@ async def handle_read_file(arguments: dict):
     if not path:
         raise ValueError("path must be provided")
 
-    return await _read_single_file(path)
+    # Get the line range parameters
+    offset = arguments.get("offset")
+    limit = arguments.get("limit")
+
+    return await _read_single_file(path, offset, limit)
 
 async def handle_read_multiple_files(arguments: dict):
     paths = arguments.get("paths", [])

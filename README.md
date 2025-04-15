@@ -495,7 +495,8 @@ Fetches content from a URL and optionally saves it to a file.
         "Accept": "application/json"
     },
     "timeout": 15,
-    "save_to_file": "downloads/octocat.json"
+    "save_to_file": "downloads/octocat.json",
+    "convert_html_to_markdown": true
 }
 ```
 
@@ -506,9 +507,10 @@ Fetches content from a URL and optionally saves it to a file.
 | headers | object | No | Optional HTTP headers to include in the request |
 | timeout | integer | No | Maximum time to wait for response (default: 10s) |
 | save_to_file | string | No | Path to save response content (within allowed directory) |
+| convert_html_to_markdown | boolean | No | When true, converts HTML content to markdown for better readability (default: true) |
 
 **Returns:**
-Response content as text with HTTP status code and size information. For binary content, returns metadata and saves to file if requested.
+Response content as text with HTTP status code and size information. For binary content, returns metadata and saves to file if requested. When convert_html_to_markdown is enabled, HTML content is automatically converted to markdown format for better readability.
 
 This tool can be used to access web APIs, fetch documentation, or download content from the web while respecting size limits (10MB max) and security constraints.
 
@@ -525,6 +527,12 @@ skydeckai-code-cli --tool web_fetch --args '{
 skydeckai-code-cli --tool web_fetch --args '{
     "url": "https://github.com/github/github-mcp-server/blob/main/README.md",
     "save_to_file": "downloads/readme.md"
+}'
+
+# Fetch a webpage and convert to markdown for better readability
+skydeckai-code-cli --tool web_fetch --args '{
+    "url": "https://example.com",
+    "convert_html_to_markdown": true
 }'
 ```
 

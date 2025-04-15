@@ -48,6 +48,12 @@ def web_fetch_tool():
                                    "will be saved to this location. Must be within the allowed directory. Example: "
                                    "'downloads/page.html', 'data/api_response.json'.",
                     "default": None
+                },
+                "convert_html_to_markdown": {
+                    "type": "boolean",
+                    "description": "If set to true and the content is HTML, it will be converted to markdown format "
+                                   "for better readability. This is especially useful for web pages with a lot of content.",
+                    "default": True
                 }
             },
             "required": ["url"]
@@ -61,6 +67,7 @@ async def handle_web_fetch(arguments: dict) -> List[TextContent]:
     headers = arguments.get("headers", {})
     timeout = arguments.get("timeout", 10)
     save_to_file = arguments.get("save_to_file")
+    convert_html_to_markdown = arguments.get("convert_html_to_markdown", True)
 
     if not url:
         raise ValueError("URL must be provided")
@@ -123,6 +130,23 @@ async def handle_web_fetch(arguments: dict) -> List[TextContent]:
         # Try to decode the content
         try:
             text_content = content.decode('utf-8')
+
+            # Convert HTML to markdown if requested and content appears to be HTML
+            if convert_html_to_markdown and ("html" in content_type or text_content.strip().startswith(("<!DOCTYPE", "<html"))):
+                try:
+                    # Using the html2text library to convert HTML to markdown
+                    # Need to import here to avoid dependency issues if the library is not installed
+                    import html2text
+                    h = html2text.HTML2Text()
+                    h.ignore_links = False
+                    h.ignore_images = False
+                    h.ignore_emphasis = False
+                    h.body_width = 0  # Don't wrap text
+                    text_content = h.handle(text_content)
+                except ImportError:
+                    # Add note that html2text needs to be installed
+                    text_content = f"NOTE: Could not convert HTML to markdown because html2text library is not installed.\n\n{text_content}"
+
         except UnicodeDecodeError:
             # If content can't be decoded as utf-8, provide info about binary content
             if full_save_path:
@@ -140,10 +164,11 @@ async def handle_web_fetch(arguments: dict) -> List[TextContent]:
         status_info = f"HTTP {response.status_code}"
         size_info = f"{len(content)} bytes"
         save_info = f", saved to {save_to_file}" if full_save_path else ""
+        format_info = " (converted to markdown)" if convert_html_to_markdown and ("html" in content_type or text_content.strip().startswith(("<!DOCTYPE", "<html"))) else ""
 
         result = [TextContent(
             type="text",
-            text=f"{status_info}, {size_info}{save_info}:\n\n{text_content}"
+            text=f"{status_info}, {size_info}{save_info}{format_info}:\n\n{text_content}"
         )]
 
         return result

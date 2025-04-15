@@ -1,6 +1,6 @@
 [project]
 name = "skydeckai-code"
-version = "0.1.24"
+version = "0.1.25"
 description = "This MCP server provides a comprehensive set of tools for AI-driven Development workflows including file operations, code analysis, multi-language execution, Git operations, web content fetching, code content searching, and system information retrieval."
 readme = "README.md"
 requires-python = ">=3.11"

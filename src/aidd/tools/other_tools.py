@@ -190,25 +190,23 @@ async def _execute_tool_with_error_handling(handler, arguments, tool_name, index
 def think_tool():
     return {
         "name": "think",
-        "description": "Use the tool to think about something. "
-                    "WHEN TO USE: When complex reasoning or brainstorming is needed without making any changes to files "
-                    "or retrieving additional information. Useful for analyzing problems, planning approaches, evaluating "
-                    "options, or organizing thoughts before taking action. "
-                    "WHEN NOT TO USE: When immediate action is needed, when you need to query for new information, "
-                    "or when a simple explanation would suffice. "
-                    "RETURNS: The thoughts you provided, formatted as markdown. This tool does not retrieve new information "
-                    "or make any changes to the repository - it simply records your reasoning process for reference. "
-                    "This is particularly valuable when exploring complex bugs, designing architecture, or evaluating "
-                    "multiple approaches to a problem.",
+        "description": "Use the tool to methodically think through a complex problem step-by-step. "
+                    "WHEN TO USE: When tackling complex reasoning tasks that benefit from breaking down problems, exploring multiple perspectives, "
+                    "or reasoning through chains of consequences. Ideal for planning system architecture, debugging complex issues, "
+                    "anticipating edge cases, weighing tradeoffs, or making implementation decisions. "
+                    "WHEN NOT TO USE: For simple explanations, direct code writing, retrieving information, or when immediate action is needed. "
+                    "RETURNS: Your structured thinking process formatted as markdown. This tool helps you methodically document your reasoning "
+                    "without making repository changes. Structuring your thoughts with this tool can lead to more reliable reasoning "
+                    "and better decision-making, especially for complex problems where it's easy to overlook important considerations.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "thought": {
                     "type": "string",
-                    "description": "Your detailed thoughts, analysis, reasoning, or brainstorming. Can include markdown "
-                                   "formatting for better readability, like bullet points, headings, or code blocks. "
-                                   "Examples: Analyzing the root cause of a bug, evaluating different API design choices, "
-                                   "planning refactoring steps, or brainstorming optimization strategies."
+                    "description": "Your step-by-step thinking process, including: breaking down problems, exploring alternatives, "
+                                   "considering pros/cons, examining assumptions, listing requirements, or working through edge cases. "
+                                   "Structure your thinking using markdown elements like bullet points, numbered lists, headings, or code blocks. "
+                                   "The more systematic your thinking, the better the outcome."
                 }
             },
             "required": ["thought"]

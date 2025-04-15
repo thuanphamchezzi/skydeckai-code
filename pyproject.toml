@@ -1,7 +1,7 @@
 [project]
 name = "skydeckai-code"
 version = "0.1.23"
-description = "This MCP server provides a set of tools that support AI-driven Development workflows."
+description = "This MCP server provides a comprehensive set of tools for AI-driven Development workflows including file operations, code analysis, multi-language execution, Git operations, web content fetching, code content searching, and system information retrieval."
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [{name = "SkyDeck.ai", email = "support@skydeck.ai"}]
@@ -28,6 +28,7 @@ dependencies = [
     "pygetwindow>=0.0.9",
     "pyobjc-framework-Quartz>=11.0",
     "pillow>=11.1.0",
+    "requests>=2.32.3",
 ]
 
 [tool.hatch.build.targets.wheel]

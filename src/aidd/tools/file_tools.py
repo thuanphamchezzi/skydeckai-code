@@ -4,10 +4,12 @@ import os
 import re
 import stat
 import subprocess
+import shutil
 from datetime import datetime
 from typing import List
 
 import mcp.types as types
+from mcp.types import TextContent
 
 from .state import state
 
@@ -91,6 +93,40 @@ def move_file_tool():
         },
     }
 
+def copy_file_tool():
+    return {
+        "name": "copy_file",
+        "description": "Copy a file or directory to a new location. "
+                    "WHEN TO USE: When you need to duplicate files or directories while keeping the original intact, create backups, "
+                    "or replicate configuration files for different environments. Useful for testing changes without risking original files, "
+                    "creating template files, or duplicating project structures. "
+                    "WHEN NOT TO USE: When you want to move a file without keeping the original (use move_file instead), when the destination "
+                    "already exists (the operation will fail), or when either source or destination is outside the allowed workspace. "
+                    "RETURNS: A confirmation message indicating that the file or directory was successfully copied. "
+                    "For directories, the entire directory structure is copied recursively. Parent directories of the destination "
+                    "will be created automatically if they don't exist. Both source and destination must be within the allowed directory. "
+                    "Example: source='config.json', destination='config.backup.json'",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "source": {
+                    "type": "string",
+                    "description": "Source path of the file or directory to copy. This file or directory must exist. Both absolute and relative paths are supported, but must be within the allowed workspace. Examples: 'document.txt', 'src/utils.js', 'config/settings/'"
+                },
+                "destination": {
+                    "type": "string",
+                    "description": "Destination path where to copy the file or directory. If this path already exists, the operation will fail. Parent directories will be created automatically if they don't exist. Both absolute and relative paths are supported, but must be within the allowed workspace. Examples: 'document.backup.txt', 'backup/document.txt', 'src/new-project/'"
+                },
+                "recursive": {
+                    "type": "boolean",
+                    "description": "Whether to copy directories recursively. If set to true and the source is a directory, all subdirectories and files will be copied. If set to false and the source is a directory, the operation will fail. Defaults to true.",
+                    "default": True
+                }
+            },
+            "required": ["source", "destination"]
+        },
+    }
+
 def search_files_tool():
     return {
         "name": "search_files",
@@ -98,8 +134,8 @@ def search_files_tool():
                     "WHEN TO USE: When you need to find files or directories by name pattern across a directory tree, locate files with specific extensions, "
                     "or find items containing certain text in their names. Useful for locating configuration files, finding all files of a certain type, "
                     "or gathering files related to a specific feature. "
-                    "WHEN NOT TO USE: When searching for content within files (there is no grep tool in this application), when you need a flat listing of a single directory "
-                    "(use directory_listing instead), or when you need to analyze code structure (use codebase_mapper instead). "
+                    "WHEN NOT TO USE: When searching for content within files (use search_code tool for that), when you need a flat listing of a single directory "
+                    "(use list_directory instead), or when you need to analyze code structure (use codebase_mapper instead). "
                     "RETURNS: A list of matching files and directories with their types ([FILE] or [DIR]) and relative paths. "
                     "For Git repositories, only shows tracked files and directories by default. "
                     "The search is recursive and case-insensitive. Only searches within the allowed directory. "
@@ -261,10 +297,8 @@ def edit_file_tool():
         }
     }
 
-async def _read_single_file(path: str) -> List[types.TextContent]:
+async def _read_single_file(path: str) -> List[TextContent]:
     """Helper function to read a single file with proper validation."""
-    from mcp.types import TextContent
-
     # Determine full path based on whether input is absolute or relative
     if os.path.isabs(path):
         full_path = os.path.abspath(path)  # Just normalize the absolute path
@@ -296,8 +330,6 @@ async def _read_single_file(path: str) -> List[types.TextContent]:
 
 async def handle_write_file(arguments: dict):
     """Handle writing content to a file."""
-    from mcp.types import TextContent
-
     path = arguments.get("path")
     content = arguments.get("content")
 
@@ -331,7 +363,6 @@ async def handle_write_file(arguments: dict):
     except Exception as e:
         raise ValueError(f"Error writing file: {str(e)}")
 
-
 async def handle_read_file(arguments: dict):
     path = arguments.get("path")
     if not path:
@@ -348,7 +379,6 @@ async def handle_read_multiple_files(arguments: dict):
     if not paths:
         raise ValueError("paths list cannot be empty")
 
-    from mcp.types import TextContent
     results = []
     for path in paths:
         try:
@@ -369,8 +399,6 @@ async def handle_read_multiple_files(arguments: dict):
 
 async def handle_move_file(arguments: dict):
     """Handle moving a file or directory to a new location."""
-    from mcp.types import TextContent
-
     source = arguments.get("source")
     destination = arguments.get("destination")
 
@@ -415,10 +443,67 @@ async def handle_move_file(arguments: dict):
     except Exception as e:
         raise ValueError(f"Unexpected error: {str(e)}")
 
+async def handle_copy_file(arguments: dict):
+    """Handle copying a file or directory to a new location."""
+    source = arguments.get("source")
+    destination = arguments.get("destination")
+    recursive = arguments.get("recursive", True)
+
+    if not source:
+        raise ValueError("source must be provided")
+    if not destination:
+        raise ValueError("destination must be provided")
+
+    # Determine full paths based on whether inputs are absolute or relative
+    if os.path.isabs(source):
+        full_source = os.path.abspath(source)
+    else:
+        full_source = os.path.abspath(os.path.join(state.allowed_directory, source))
+
+    if os.path.isabs(destination):
+        full_destination = os.path.abspath(destination)
+    else:
+        full_destination = os.path.abspath(os.path.join(state.allowed_directory, destination))
+
+    # Security checks
+    if not full_source.startswith(state.allowed_directory):
+        raise ValueError(f"Access denied: Source path ({full_source}) must be within allowed directory")
+    if not full_destination.startswith(state.allowed_directory):
+        raise ValueError(f"Access denied: Destination path ({full_destination}) must be within allowed directory")
+
+    # Validate source exists
+    if not os.path.exists(full_source):
+        raise ValueError(f"Source path does not exist: {source}")
+
+    # Check if destination already exists
+    if os.path.exists(full_destination):
+        raise ValueError(f"Destination already exists: {destination}")
+
+    # Create parent directories of destination if they don't exist
+    os.makedirs(os.path.dirname(full_destination), exist_ok=True)
+
+    try:
+        if os.path.isdir(full_source):
+            if not recursive:
+                raise ValueError(f"Cannot copy directory without recursive flag: {source}")
+            # Copy directory recursively
+            shutil.copytree(full_source, full_destination)
+            return [TextContent(
+                type="text",
+                text=f"Successfully copied directory {source} to {destination}"
+            )]
+        else:
+            # Copy file
+            shutil.copy2(full_source, full_destination)
+            return [TextContent(
+                type="text",
+                text=f"Successfully copied file {source} to {destination}"
+            )]
+    except Exception as e:
+        raise ValueError(f"Error copying {source} to {destination}: {str(e)}")
+
 async def handle_search_files(arguments: dict):
     """Handle searching for files matching a pattern."""
-    from mcp.types import TextContent
-
     pattern = arguments.get("pattern")
     start_path = arguments.get("path", ".")
     include_hidden = arguments.get("include_hidden", False)
@@ -524,8 +609,6 @@ async def handle_search_files(arguments: dict):
 
 async def handle_get_file_info(arguments: dict):
     """Handle getting detailed information about a file or directory."""
-    from mcp.types import TextContent
-
     path = arguments.get("path")
     if not path:
         raise ValueError("path must be provided")
@@ -566,8 +649,6 @@ Permissions: {perms}"""
 
 async def handle_delete_file(arguments: dict):
     """Handle deleting a file or empty directory."""
-    from mcp.types import TextContent
-
     path = arguments.get("path")
     if not path:
         raise ValueError("path must be provided")
@@ -748,8 +829,6 @@ async def apply_file_edits(file_path: str, edits: List[dict], dry_run: bool = Fa
 
 async def handle_edit_file(arguments: dict):
     """Handle editing a file with pattern matching and formatting."""
-    from mcp.types import TextContent
-
     path = arguments.get("path")
     edits = arguments.get("edits")
     dry_run = arguments.get("dryRun", False)

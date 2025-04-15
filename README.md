@@ -1,6 +1,6 @@
 # SkyDeckAI Code
 
-An MCP server that provides a comprehensive set of tools for AI-driven development workflows. Features include file system operations, code analysis using tree-sitter for multiple programming languages, Git operations, code execution, and system information retrieval. Designed to enhance AI's capability to assist in software development tasks.
+An MCP server that provides a comprehensive set of tools for AI-driven development workflows. Features include file system operations, code analysis using tree-sitter for multiple programming languages, Git operations, code execution, web content fetching, code content searching, and system information retrieval. Designed to enhance AI's capability to assist in software development tasks by providing direct access to both local and remote resources.
 
 # Formerly Known As MCP-Server-AIDD
 
@@ -57,11 +57,13 @@ If you're using SkyDeck AI Helper app, you can search for "SkyDeckAI Code" and i
 
 ## Key Features
 
--   File system operations (read, write, edit, move, delete)
+-   File system operations (read, write, edit, move, copy, delete)
 -   Directory management and traversal
 -   Multi-language code analysis using tree-sitter
+-   Code content searching with regex pattern matching
 -   Multi-language code execution with safety measures
--   Git operations (status, diff, commit, branch management)
+-   Git operations (status, diff, commit, branch management, cloning)
+-   Web content fetching from APIs and websites
 -   Security controls with configurable workspace boundaries
 -   Screenshot and screen context tools
 -   Image handling tools
@@ -70,14 +72,15 @@ If you're using SkyDeck AI Helper app, you can search for "SkyDeckAI Code" and i
 
 ### Basic File Operations
 
-| Tool                | Parameters                          | Returns                                       |
-| ------------------- | ----------------------------------- | --------------------------------------------- |
-| read_file           | path: string                        | File content                                  |
-| read_multiple_files | paths: string[]                     | Multiple file contents with headers           |
-| write_file          | path: string, content: string       | Success confirmation                          |
-| move_file           | source: string, destination: string | Success confirmation                          |
-| delete_file         | path: string                        | Success confirmation                          |
-| get_file_info       | path: string                        | File metadata (size, timestamps, permissions) |
+| Tool                | Parameters                                               | Returns                                       |
+| ------------------- | -------------------------------------------------------- | --------------------------------------------- |
+| read_file           | path: string                                             | File content                                  |
+| read_multiple_files | paths: string[]                                          | Multiple file contents with headers           |
+| write_file          | path: string, content: string                            | Success confirmation                          |
+| move_file           | source: string, destination: string                      | Success confirmation                          |
+| copy_file           | source: string, destination: string, recursive?: boolean | Success confirmation                          |
+| delete_file         | path: string                                             | Success confirmation                          |
+| get_file_info       | path: string                                             | File metadata (size, timestamps, permissions) |
 
 Common usage:
 
@@ -87,6 +90,9 @@ skydeckai-code-cli --tool read_file --args '{"path": "src/main.py"}'
 
 # Write file
 skydeckai-code-cli --tool write_file --args '{"path": "output.txt", "content": "Hello World"}'
+
+# Copy file or directory
+skydeckai-code-cli --tool copy_file --args '{"source": "config.json", "destination": "config.backup.json"}'
 
 # Get file info
 skydeckai-code-cli --tool get_file_info --args '{"path": "src/main.py"}'
@@ -128,6 +134,8 @@ Returns: Diff of changes or preview in dry run mode.
 | create_directory         | path: string                                             | Success confirmation           |
 | search_files             | pattern: string, path?: string, include_hidden?: boolean | Matching files list            |
 
+The `search_files` tool searches for files by name pattern, while the `search_code` tool searches within file contents using regex. Use `search_files` when looking for files with specific names or extensions, and `search_code` when searching for specific text patterns inside files.
+
 #### directory_tree
 
 Generates complete directory structure:
@@ -153,17 +161,18 @@ skydeckai-code-cli --tool search_files --args '{"pattern": ".py", "path": "src"}
 
 ### Git Operations
 
-| Tool              | Parameters                             | Returns                          |
-| ----------------- | -------------------------------------- | -------------------------------- |
-| git_init          | path: string, initial_branch?: string  | Repository initialization status |
-| git_status        | repo_path: string                      | Working directory status         |
-| git_add           | repo_path: string, files: string[]     | Staging confirmation             |
-| git_reset         | repo_path: string                      | Unstaging confirmation           |
-| git_checkout      | repo_path: string, branch_name: string | Branch switch confirmation       |
-| git_create_branch | repo_path: string, branch_name: string | Branch creation confirmation     |
-| git_diff_unstaged | repo_path: string                      | Unstaged changes diff            |
-| git_diff_staged   | repo_path: string                      | Staged changes diff              |
-| git_show          | repo_path: string, commit_hash: string | Details of a specific commit     |
+| Tool              | Parameters                                        | Returns                          |
+| ----------------- | ------------------------------------------------- | -------------------------------- |
+| git_init          | path: string, initial_branch?: string             | Repository initialization status |
+| git_status        | repo_path: string                                 | Working directory status         |
+| git_add           | repo_path: string, files: string[]                | Staging confirmation             |
+| git_reset         | repo_path: string                                 | Unstaging confirmation           |
+| git_checkout      | repo_path: string, branch_name: string            | Branch switch confirmation       |
+| git_create_branch | repo_path: string, branch_name: string            | Branch creation confirmation     |
+| git_clone         | url: string, target_path: string, branch?: string | Clone confirmation               |
+| git_diff_unstaged | repo_path: string                                 | Unstaged changes diff            |
+| git_diff_staged   | repo_path: string                                 | Staged changes diff              |
+| git_show          | repo_path: string, commit_hash: string            | Details of a specific commit     |
 
 #### Complex Git Operations
 
@@ -206,6 +215,9 @@ Common usage:
 # Check status
 skydeckai-code-cli --tool git_status --args '{"repo_path": "."}'
 
+# Clone a repository
+skydeckai-code-cli --tool git_clone --args '{"url": "https://github.com/username/repo.git", "target_path": "repo"}'
+
 # Create and switch to new branch
 skydeckai-code-cli --tool git_create_branch --args '{"repo_path": ".", "branch_name": "feature/new-branch"}'
 ```
@@ -243,6 +255,59 @@ Supported Languages:
 -   PHP (.php)
 -   C# (.cs)
 -   Kotlin (.kt, .kts)
+
+#### search_code
+
+Fast content search tool using regular expressions:
+
+```json
+{
+    "pattern": "function\\s+\\w+",
+    "include": "*.js",
+    "exclude": "node_modules/**",
+    "max_results": 50,
+    "case_sensitive": false,
+    "path": "src"
+}
+```
+
+**Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| pattern | string | Yes | Regular expression pattern to search in file contents |
+| include | string | No | File pattern to include (glob syntax, default: "\*") |
+| exclude | string | No | File pattern to exclude (glob syntax, default: "") |
+| max_results | integer | No | Maximum results to return (default: 100) |
+| case_sensitive | boolean | No | Whether search is case-sensitive (default: false) |
+| path | string | No | Base directory to search from (default: ".") |
+
+**Returns:**
+Matching lines grouped by file with line numbers, sorted by file modification time with newest files first.
+
+This tool uses ripgrep when available for optimal performance, with a Python fallback implementation. It's ideal for finding specific code patterns like function declarations, imports, variable usages, or error handling.
+
+**Example Usage:**
+
+```bash
+# Find function declarations in JavaScript files
+skydeckai-code-cli --tool search_code --args '{
+    "pattern": "function\\s+\\w+",
+    "include": "*.js"
+}'
+
+# Find all console.log statements with errors
+skydeckai-code-cli --tool search_code --args '{
+    "pattern": "console\\.log.*[eE]rror",
+    "path": "src"
+}'
+
+# Find import statements in TypeScript files
+skydeckai-code-cli --tool search_code --args '{
+    "pattern": "import.*from",
+    "include": "*.{ts,tsx}",
+    "exclude": "node_modules/**"
+}'
+```
 
 ### System Information
 
@@ -409,6 +474,52 @@ Reads an image file from the file system and returns its contents as a base64-en
 Base64-encoded image data that can be displayed or processed.
 
 This tool supports common image formats like PNG, JPEG, GIF, and WebP, and automatically resizes images for optimal viewing.
+
+### Web Tools
+
+#### web_fetch
+
+Fetches content from a URL and optionally saves it to a file.
+
+```json
+{
+    "url": "https://api.github.com/users/octocat",
+    "headers": {
+        "Accept": "application/json"
+    },
+    "timeout": 15,
+    "save_to_file": "downloads/octocat.json"
+}
+```
+
+**Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|---------|----------|---------------------------------------|
+| url | string | Yes | URL to fetch content from (http/https only) |
+| headers | object | No | Optional HTTP headers to include in the request |
+| timeout | integer | No | Maximum time to wait for response (default: 10s) |
+| save_to_file | string | No | Path to save response content (within allowed directory) |
+
+**Returns:**
+Response content as text with HTTP status code and size information. For binary content, returns metadata and saves to file if requested.
+
+This tool can be used to access web APIs, fetch documentation, or download content from the web while respecting size limits (10MB max) and security constraints.
+
+**Example Usage:**
+
+```bash
+# Fetch JSON from an API
+skydeckai-code-cli --tool web_fetch --args '{
+    "url": "https://api.github.com/users/octocat",
+    "headers": {"Accept": "application/json"}
+}'
+
+# Download content to a file
+skydeckai-code-cli --tool web_fetch --args '{
+    "url": "https://github.com/github/github-mcp-server/blob/main/README.md",
+    "save_to_file": "downloads/readme.md"
+}'
+```
 
 ### Code Execution
 

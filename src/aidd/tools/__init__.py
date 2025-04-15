@@ -5,6 +5,7 @@ from .code_execution import (
     handle_execute_code,
     handle_execute_shell_script,
 )
+from .code_tools import search_code_tool, handle_search_code
 from .directory_tools import (
     create_directory_tool,
     directory_tree_tool,
@@ -14,9 +15,11 @@ from .directory_tools import (
     list_directory_tool,
 )
 from .file_tools import (
+    copy_file_tool,
     delete_file_tool,
     edit_file_tool,
     get_file_info_tool,
+    handle_copy_file,
     handle_delete_file,
     handle_edit_file,
     handle_get_file_info,
@@ -36,6 +39,7 @@ from .get_available_windows_tool import get_available_windows_tool, handle_get_a
 from .git_tools import (
     git_add_tool,
     git_checkout_tool,
+    git_clone_tool,
     git_commit_tool,
     git_create_branch_tool,
     git_diff_staged_tool,
@@ -48,6 +52,7 @@ from .git_tools import (
     git_status_tool,
     handle_git_add,
     handle_git_checkout,
+    handle_git_clone,
     handle_git_commit,
     handle_git_create_branch,
     handle_git_diff,
@@ -71,6 +76,7 @@ from .screenshot_tool import (
     handle_capture_screenshot,
 )
 from .system_tools import get_system_info_tool, handle_get_system_info
+from .web_tools import web_fetch_tool, handle_web_fetch
 
 # Export all tools definitions
 TOOL_DEFINITIONS = [
@@ -83,6 +89,7 @@ TOOL_DEFINITIONS = [
     read_file_tool(),
     read_multiple_files_tool(),
     move_file_tool(),
+    copy_file_tool(),
     search_files_tool(),
     delete_file_tool(),
     get_file_info_tool(),
@@ -90,6 +97,7 @@ TOOL_DEFINITIONS = [
     execute_code_tool(),
     execute_shell_script_tool(),
     codebase_mapper_tool(),
+    search_code_tool(),
     # Git tools
     git_init_tool(),
     git_status_tool(),
@@ -102,6 +110,7 @@ TOOL_DEFINITIONS = [
     git_log_tool(),
     git_create_branch_tool(),
     git_checkout_tool(),
+    git_clone_tool(),
     git_show_tool(),
     get_system_info_tool(),
     # Screenshot tools
@@ -111,6 +120,8 @@ TOOL_DEFINITIONS = [
     get_available_windows_tool(),
     # Image tools
     read_image_file_tool(),
+    # Web tools
+    web_fetch_tool(),
 ]
 
 # Export all handlers
@@ -124,7 +135,9 @@ TOOL_HANDLERS = {
     "edit_file": handle_edit_file,
     "read_multiple_files": handle_read_multiple_files,
     "move_file": handle_move_file,
+    "copy_file": handle_copy_file,
     "search_files": handle_search_files,
+    "search_code": handle_search_code,
     "delete_file": handle_delete_file,
     "get_file_info": handle_get_file_info,
     "directory_tree": handle_directory_tree,
@@ -143,6 +156,7 @@ TOOL_HANDLERS = {
     "git_log": handle_git_log,
     "git_create_branch": handle_git_create_branch,
     "git_checkout": handle_git_checkout,
+    "git_clone": handle_git_clone,
     "git_show": handle_git_show,
     "get_system_info": handle_get_system_info,
     # Screenshot handlers
@@ -152,4 +166,6 @@ TOOL_HANDLERS = {
     "get_available_windows": handle_get_available_windows,
     # Image handlers
     "read_image_file": handle_read_image_file,
+    # Web handlers
+    "web_fetch": handle_web_fetch,
 }

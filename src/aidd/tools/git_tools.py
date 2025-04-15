@@ -424,6 +424,46 @@ def git_show_tool():
         }
     }
 
+def git_clone_tool():
+    return {
+        "name": "git_clone",
+        "description": "Clones a remote Git repository into a new directory. "
+                    "WHEN TO USE: When you need to download a copy of an existing Git repository, start working with a "
+                    "remote codebase, or initialize a new local copy of a project. Useful for contributing to open-source "
+                    "projects, setting up new development environments, or accessing shared code repositories. "
+                    "WHEN NOT TO USE: When the target directory already contains a Git repository, when you only need to "
+                    "update an existing repository (use git_pull instead), or when you want to create a new empty repository "
+                    "(use git_init instead). "
+                    "RETURNS: A confirmation message indicating that the repository was successfully cloned, including "
+                    "the source URL and destination directory. Repository must be cloned to a location within the allowed directory.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "url": {
+                    "type": "string",
+                    "description": "URL of the remote repository to clone. This can be an HTTPS URL, SSH URL, or local path. "
+                                   "Examples: 'https://github.com/username/repo.git', 'git@github.com:username/repo.git', "
+                                   "'/path/to/local/repo'. Security restrictions may apply to certain URLs."
+                },
+                "target_path": {
+                    "type": "string",
+                    "description": "Directory where the repository will be cloned. If the directory doesn't exist, it will "
+                                   "be created. If it exists, it must be empty. Examples: 'my-project', 'src/external', "
+                                   "'path/to/clone'. Both absolute and relative paths are supported, but must be within "
+                                   "the allowed workspace."
+                },
+                "branch": {
+                    "type": "string",
+                    "description": "Branch to check out after cloning. If not specified, the repository's default branch "
+                                   "is used. Examples: 'main', 'develop', 'feature/new-feature'. Specifying a branch can "
+                                   "save time when working with large repositories.",
+                    "default": None
+                }
+            },
+            "required": ["url", "target_path"]
+        }
+    }
+
 async def handle_git_status(arguments: dict) -> List[TextContent]:
     """Handle getting git repository status."""
     repo = _get_repo(arguments["repo_path"])
@@ -685,3 +725,50 @@ async def handle_git_show(arguments: dict) -> List[TextContent]:
         )]
     except Exception as e:
         raise ValueError(f"Error showing commit at '{repo.working_dir}': {str(e)}")
+
+async def handle_git_clone(arguments: dict) -> List[TextContent]:
+    """Handle cloning a remote git repository."""
+    url = arguments.get("url")
+    if not url:
+        raise ValueError("url is required")
+    target_path = arguments.get("target_path")
+    if not target_path:
+        raise ValueError("target_path is required")
+    branch = arguments.get("branch")
+
+    # Determine full path based on whether input is absolute or relative
+    if os.path.isabs(target_path):
+        full_path = os.path.abspath(target_path)
+    else:
+        full_path = os.path.abspath(os.path.join(state.allowed_directory, target_path))
+
+    # Security check
+    if not full_path.startswith(state.allowed_directory):
+        raise ValueError(f"Access denied: Path ({full_path}) must be within allowed directory")
+
+    try:
+        # Check if directory exists and is empty
+        if os.path.exists(full_path):
+            if os.path.isdir(full_path) and os.listdir(full_path):
+                raise ValueError(f"Target directory '{full_path}' is not empty")
+            elif not os.path.isdir(full_path):
+                raise ValueError(f"Target path '{full_path}' exists but is not a directory")
+        else:
+            # Create directory if it doesn't exist
+            os.makedirs(full_path, exist_ok=True)
+
+        # Clone options
+        clone_args = {}
+        if branch:
+            clone_args["branch"] = branch
+
+        # Perform the clone
+        repo = git.Repo.clone_from(url, full_path, **clone_args)
+
+        branch_info = f" (branch: {branch})" if branch else ""
+        return [TextContent(
+            type="text",
+            text=f"Repository successfully cloned from {url} to {target_path}{branch_info}"
+        )]
+    except Exception as e:
+        raise ValueError(f"Error cloning repository: {str(e)}")

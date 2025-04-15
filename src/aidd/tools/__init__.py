@@ -65,6 +65,7 @@ from .git_tools import (
     handle_git_status,
 )
 from .image_tools import read_image_file_tool, handle_read_image_file
+from .other_tools import batch_tools_tool, handle_batch_tools
 from .path_tools import (
     get_allowed_directory_tool,
     handle_get_allowed_directory,
@@ -98,6 +99,7 @@ TOOL_DEFINITIONS = [
     execute_shell_script_tool(),
     codebase_mapper_tool(),
     search_code_tool(),
+    batch_tools_tool(),
     # Git tools
     git_init_tool(),
     git_status_tool(),
@@ -144,6 +146,7 @@ TOOL_HANDLERS = {
     "execute_code": handle_execute_code,
     "execute_shell_script": handle_execute_shell_script,
     "codebase_mapper": handle_codebase_mapper,
+    "batch_tools": handle_batch_tools,
     # Git handlers
     "git_init": handle_git_init,
     "git_status": handle_git_status,

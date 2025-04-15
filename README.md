@@ -64,6 +64,7 @@ If you're using SkyDeck AI Helper app, you can search for "SkyDeckAI Code" and i
 -   Multi-language code execution with safety measures
 -   Git operations (status, diff, commit, branch management, cloning)
 -   Web content fetching from APIs and websites
+-   Batch operations for parallel and serial tool execution
 -   Security controls with configurable workspace boundaries
 -   Screenshot and screen context tools
 -   Image handling tools
@@ -518,6 +519,101 @@ skydeckai-code-cli --tool web_fetch --args '{
 skydeckai-code-cli --tool web_fetch --args '{
     "url": "https://github.com/github/github-mcp-server/blob/main/README.md",
     "save_to_file": "downloads/readme.md"
+}'
+```
+
+### Utility Tools
+
+#### batch_tools
+
+Execute multiple tool invocations in a single request with parallel execution when possible.
+
+```json
+{
+    "description": "Setup new project",
+    "sequential": true,
+    "invocations": [
+        {
+            "tool": "create_directory",
+            "arguments": {
+                "path": "src"
+            }
+        },
+        {
+            "tool": "write_file",
+            "arguments": {
+                "path": "README.md",
+                "content": "# New Project\n\nThis is a new project."
+            }
+        },
+        {
+            "tool": "git_init",
+            "arguments": {
+                "path": ".",
+                "initial_branch": "main"
+            }
+        }
+    ]
+}
+```
+
+**Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|---------|----------|---------------------------------------|
+| description | string | Yes | Short description of the batch operation |
+| sequential | boolean | No | Whether to run tools in sequence (default: false) |
+| invocations | array | Yes | List of tool invocations to execute |
+| invocations[].tool | string | Yes | Name of the tool to invoke |
+| invocations[].arguments | object | Yes | Arguments for the specified tool |
+
+**Returns:**
+Combined results from all tool invocations, grouped by tool with success/error status for each. Results are presented in the original invocation order with clear section headers.
+
+This tool provides efficient execution of multiple operations in a single request. When `sequential` is false (default), tools are executed in parallel for better performance. When `sequential` is true, tools are executed in order, and if any tool fails, execution stops.
+
+**IMPORTANT**: All tools in the batch execute in the same working directory context. If a tool creates a directory and a subsequent tool needs to work inside that directory, you must either:
+
+1. Use paths relative to the current working directory (e.g., "project/src" rather than just "src"), or
+2. Include an explicit tool invocation to change directories using `update_allowed_directory`
+
+**Example Usage:**
+
+```bash
+# Setup a new project with multiple steps in sequential order (using proper paths)
+skydeckai-code-cli --tool batch_tools --args '{
+    "description": "Setup new project",
+    "sequential": true,
+    "invocations": [
+        {"tool": "create_directory", "arguments": {"path": "project"}},
+        {"tool": "create_directory", "arguments": {"path": "project/src"}},
+        {"tool": "write_file", "arguments": {"path": "project/README.md", "content": "# Project\n\nA new project."}}
+    ]
+}'
+
+# Create nested structure using relative paths (without changing directory)
+skydeckai-code-cli --tool batch_tools --args '{
+    "description": "Create project structure",
+    "sequential": true,
+    "invocations": [
+        {"tool": "create_directory", "arguments": {"path": "project/src"}},
+        {"tool": "create_directory", "arguments": {"path": "project/docs"}},
+        {"tool": "write_file", "arguments": {"path": "project/README.md", "content": "# Project"}}
+    ]
+}'
+
+# Gather system information and take a screenshot (tasks can run in parallel)
+skydeckai-code-cli --tool batch_tools --args '{
+    "description": "System diagnostics",
+    "sequential": false,
+    "invocations": [
+        {"tool": "get_system_info", "arguments": {}},
+        {"tool": "capture_screenshot", "arguments": {
+            "output_path": "diagnostics/screen.png",
+            "capture_mode": {
+                "type": "full"
+            }
+        }}
+    ]
 }'
 ```
 

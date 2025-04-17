@@ -10,22 +10,6 @@ This mcp server was formerly known as `mcp-server-aidd`. It was renamed to `skyd
 
 ## Installation
 
-### Installing via Smithery
-
-To install SkyDeckAI Code for Claude Desktop automatically via [Smithery](https://smithery.ai/server/skydeckai-code):
-
-```bash
-npx -y @smithery/cli install skydeckai-code --client claude
-```
-
-### Installing via McpGet
-
-```bash
-npx @michaellatman/mcp-get@latest install skydeckai-code
-```
-
-### Manual Installation
-
 ```bash
 # Using pip
 pip install skydeckai-code

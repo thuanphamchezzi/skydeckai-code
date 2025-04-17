@@ -13,9 +13,6 @@ This mcp server was formerly known as `mcp-server-aidd`. It was renamed to `skyd
 ```bash
 # Using pip
 pip install skydeckai-code
-
-# Using uv
-uvx skydeckai-code
 ```
 
 ## Claude Desktop Setup

@@ -283,16 +283,6 @@ def edit_file_tool():
                 "options": {
                     "type": "object",
                     "properties": {
-                        "preserveIndentation": {
-                            "type": "boolean",
-                            "description": "Keep existing indentation when replacing text. When true, the indentation of the first line of oldText is preserved in newText.",
-                            "default": True
-                        },
-                        "normalizeWhitespace": {
-                            "type": "boolean",
-                            "description": "Normalize spaces while preserving structure. When true, consecutive spaces are treated as a single space during matching, making the search more forgiving of whitespace differences.",
-                            "default": True
-                        },
                         "partialMatch": {
                             "type": "boolean",
                             "description": "Enable fuzzy matching for finding text. When true, the tool will try to find the best match even if it's not an exact match, using a confidence threshold of 80%.",
@@ -730,21 +720,17 @@ async def handle_delete_file(arguments: dict):
     except Exception as e:
         raise ValueError(f"Error deleting {path}: {str(e)}")
 
-def normalize_whitespace(text: str, preserve_indentation: bool = True) -> str:
-    """Normalize whitespace while optionally preserving indentation."""
+def normalize_whitespace(text: str) -> str:
+    """Normalize whitespace while preserving indentation."""
     lines = text.splitlines()
     normalized_lines = []
 
     for line in lines:
-        if preserve_indentation:
-            # Preserve leading whitespace
-            indent = re.match(r'^\s*', line).group(0)
-            # Normalize other whitespace
-            content = re.sub(r'\s+', ' ', line.lstrip())
-            normalized_lines.append(f"{indent}{content}")
-        else:
-            # Normalize all whitespace
-            normalized_lines.append(re.sub(r'\s+', ' ', line.strip()))
+        # Preserve leading whitespace
+        indent = re.match(r'^\s*', line).group(0)
+        # Normalize other whitespace
+        content = re.sub(r'\s+', ' ', line.lstrip())
+        normalized_lines.append(f"{indent}{content}")
 
     return '\n'.join(normalized_lines)
 
@@ -813,8 +799,6 @@ async def apply_file_edits(file_path: str, edits: List[dict], dry_run: bool = Fa
     """Apply edits to a file with optional formatting and return diff."""
     # Set default options
     options = options or {}
-    preserve_indentation = options.get('preserveIndentation', True)
-    normalize_ws = options.get('normalizeWhitespace', True)
     partial_match = options.get('partialMatch', True)
 
     # Read file content
@@ -830,20 +814,16 @@ async def apply_file_edits(file_path: str, edits: List[dict], dry_run: bool = Fa
         old_text = edit['oldText']
         new_text = edit['newText']
 
-        # Normalize texts if requested
-        if normalize_ws:
-            search_text = normalize_whitespace(old_text, preserve_indentation)
-            working_content = normalize_whitespace(modified_content, preserve_indentation)
-        else:
-            search_text = old_text
-            working_content = modified_content
+        # Use original text for matching
+        search_text = old_text
+        working_content = modified_content
 
         # Find best match
         start, end, confidence = find_best_match(working_content, search_text, partial_match)
 
         if confidence >= 0.8:
-            # Preserve indentation of first line if requested
-            if preserve_indentation and start >= 0:
+            # Always preserve indentation of first line
+            if start >= 0:
                 indent = re.match(r'^\s*', modified_content[start:].splitlines()[0]).group(0)
                 replacement = '\n'.join(indent + line.lstrip()
                                       for line in new_text.splitlines())

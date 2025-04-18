@@ -18,12 +18,13 @@ def check_lint_tool():
                     "when you need detailed code analysis with custom rules, or for compiled languages where linting may not apply. "
                     "RETURNS: A detailed report of linting issues found in the codebase, including file paths, line numbers, "
                     "issue descriptions, and severity levels. Issues are grouped by file and sorted by severity. "
-                    "Note: Respects config files like .pylintrc, .flake8, and .eslintrc if present.\n\n"
+                    "Note: Respects config files like .pylintrc, .flake8, .eslintrc, and analysis_options.yaml if present.\n\n"
                     "EXAMPLES:\n"
                     "- Basic usage: {\"path\": \"src\"}\n"
                     "- Python with custom line length: {\"path\": \"src\", \"linters\": {\"flake8\": \"--max-line-length=120 --ignore=E501,E302\"}}\n"
                     "- Disable specific pylint checks: {\"linters\": {\"pylint\": \"--disable=missing-docstring,invalid-name\"}}\n"
                     "- TypeScript only: {\"path\": \"src\", \"languages\": [\"typescript\"], \"linters\": {\"eslint\": \"--no-eslintrc --config .eslintrc.custom.js\"}}\n"
+                    "- Dart only: {\"path\": \"lib\", \"languages\": [\"dart\"], \"linters\": {\"dart_analyze\": \"--fatal-infos\"}}\n"
                     "- Disable a linter: {\"linters\": {\"flake8\": false}, \"max_issues\": 50}\n"
                     "- Single file check: {\"path\": \"src/main.py\"}",
         "inputSchema": {
@@ -41,12 +42,12 @@ def check_lint_tool():
                         "type": "string"
                     },
                     "description": "List of languages to lint. If empty, will auto-detect based on file extensions. "
-                                  "Supported languages include: 'python', 'javascript', 'typescript'.",
+                                  "Supported languages include: 'python', 'javascript', 'typescript', 'dart'.",
                     "default": []
                 },
                 "linters": {
                     "type": "object",
-                    "description": "Configuration for specific linters. Each key is a linter name ('pylint', 'flake8', 'eslint') "
+                    "description": "Configuration for specific linters. Each key is a linter name ('pylint', 'flake8', 'eslint', 'dart_analyze') "
                                   "and the value is either a boolean to enable/disable or a string with CLI arguments.",
                     "properties": {
                         "pylint": {
@@ -60,16 +61,21 @@ def check_lint_tool():
                         "eslint": {
                             "type": ["boolean", "string"],
                             "description": "Whether to use eslint or custom eslint arguments."
+                        },
+                        "dart_analyze": {
+                            "type": ["boolean", "string"],
+                            "description": "Whether to use 'dart analyze' or custom dart analyze arguments."
                         }
                     },
                     "default": {}
                 },
                 "max_issues": {
                     "type": "integer",
-                    "description": "Maximum number of linting issues to return. Set to 0 for unlimited.",
+                    "description": "Maximum number of issues to return. Set to 0 for unlimited.",
                     "default": 100
                 }
-            }
+            },
+            "required": []
         }
     }
 
@@ -108,8 +114,15 @@ async def handle_check_lint(arguments: dict) -> List[TextContent]:
             language = _detect_language_from_file(full_path)
             if language:
                 languages = [language]
+            else:
+                # If we can't detect a supported language for the file
+                _, ext = os.path.splitext(full_path)
+                return [TextContent(
+                    type="text",
+                    text=f"Unsupported file type: {ext}\nThe check_lint tool only supports: .py, .js, .jsx, .ts, .tsx, .dart files.\nSupported languages are: python, javascript, typescript, dart."
+                )]
         else:
-            languages = ["python", "javascript", "typescript"]  # Default to common languages
+            languages = ["python", "javascript", "typescript", "dart"]  # Default to common languages
 
     # Prepare linter configurations with defaults
     linter_defaults = {
@@ -122,8 +135,40 @@ async def handle_check_lint(arguments: dict) -> List[TextContent]:
         },
         "typescript": {
             "eslint": True
+        },
+        "dart": {
+            "dart_analyze": True
         }
     }
+
+    # Validate languages if explicitly specified
+    if languages and os.path.isfile(full_path):
+        _, ext = os.path.splitext(full_path)
+        ext_language_map = {
+            '.py': 'python',
+            '.js': 'javascript',
+            '.jsx': 'javascript',
+            '.ts': 'typescript',
+            '.tsx': 'typescript',
+            '.dart': 'dart',
+            '.flutter': 'dart'
+        }
+        detected_language = ext_language_map.get(ext.lower())
+
+        # If we have a mismatch between specified language and file extension
+        if detected_language and not any(lang == detected_language for lang in languages):
+            return [TextContent(
+                type="text",
+                text=f"Language mismatch: File has {ext} extension but you specified {languages}.\n"
+                     f"For this file extension, please use: {detected_language}"
+            )]
+
+        # If file type is not supported at all
+        if not detected_language:
+            return [TextContent(
+                type="text",
+                text=f"Unsupported file type: {ext}\nThe check_lint tool only supports: .py, .js, .jsx, .ts, .tsx, .dart files.\nSupported languages are: python, javascript, typescript, dart."
+            )]
 
     # Process each language
     all_issues = []
@@ -378,18 +423,105 @@ async def _run_linter(linter_name: str, path: str, custom_args: str = None) -> L
             # Silently fail if eslint is not installed
             pass
 
+    elif linter_name == "dart_analyze":
+        try:
+            # Build the command
+            cmd = ["dart", "analyze", "--format=json"]
+
+            if custom_args:
+                cmd.extend(custom_args.split())
+
+            # Add target path
+            cmd.append(path)
+
+            # Run dart analyze
+            result = subprocess.run(cmd, capture_output=True, text=True)
+
+            if result.stdout.strip():
+                # Parse Dart Analyze JSON output
+                try:
+                    dart_results = json.loads(result.stdout)
+                    for file_result in dart_results.get("issues", []):
+                        # Get file path and ensure it's absolute
+                        file_path = file_result.get("path", "")
+                        if not os.path.isabs(file_path):
+                            file_path = os.path.abspath(os.path.join(os.path.dirname(path), file_path))
+
+                        # Security check for file path and exclude system directories
+                        if not file_path.startswith(state.allowed_directory) or _is_excluded_system_directory(file_path):
+                            continue
+
+                        issues.append({
+                            "file": os.path.relpath(file_path, state.allowed_directory),
+                            "line": file_result.get("location", {}).get("startLine", 0),
+                            "column": file_result.get("location", {}).get("startColumn", 0),
+                            "message": file_result.get("message", ""),
+                            "severity": _map_dart_severity(file_result.get("severity", "")),
+                            "source": "dart",
+                            "code": file_result.get("code", "")
+                        })
+                except json.JSONDecodeError:
+                    # Try parsing Flutter-specific error format (from compilation errors)
+                    try:
+                        # For flutter/dart compilation errors which might not be in JSON format
+                        dart_issues = []
+                        for line in result.stdout.splitlines() + result.stderr.splitlines():
+                            # Check if line contains a compilation error pattern
+                            error_match = re.search(r'(.*?):(\d+):(\d+):\s+(error|warning|info):\s+(.*)', line)
+                            if error_match:
+                                file_path, line_num, col, severity, message = error_match.groups()
+
+                                # Ensure path is absolute for security check
+                                if not os.path.isabs(file_path):
+                                    file_path = os.path.abspath(os.path.join(os.path.dirname(path), file_path))
+
+                                # Security check for file path
+                                if not file_path.startswith(state.allowed_directory) or _is_excluded_system_directory(file_path):
+                                    continue
+
+                                dart_issues.append({
+                                    "file": os.path.relpath(file_path, state.allowed_directory),
+                                    "line": int(line_num),
+                                    "column": int(col),
+                                    "message": message,
+                                    "severity": severity,
+                                    "source": "dart",
+                                    "code": "compilation-error"
+                                })
+
+                        # If we found compilation errors, add them
+                        issues.extend(dart_issues)
+                    except Exception:
+                        # Handle any parsing errors
+                        if result.stderr:
+                            issues.append({
+                                "file": path if os.path.isfile(path) else "",
+                                "line": 1,
+                                "column": 1,
+                                "message": f"Error running dart analyze: {result.stderr}",
+                                "severity": "error",
+                                "source": "dart",
+                                "code": "tool-error"
+                            })
+        except (subprocess.SubprocessError, FileNotFoundError):
+            # Silently fail if dart is not installed
+            pass
+
     return issues
 
 def _detect_language_from_file(file_path: str) -> Optional[str]:
-    """Detect programming language based on file extension."""
-    ext = os.path.splitext(file_path)[1].lower()
+    """Detect the programming language based on file extension."""
+    _, ext = os.path.splitext(file_path)
+    ext = ext.lower()
 
     language_map = {
         '.py': 'python',
         '.js': 'javascript',
-        '.ts': 'typescript',
         '.jsx': 'javascript',
+        '.ts': 'typescript',
         '.tsx': 'typescript',
+        '.dart': 'dart',
+        '.flutter': 'dart'
     }
 
     return language_map.get(ext)
@@ -413,6 +545,15 @@ def _map_eslint_severity(severity: int) -> str:
         return "warning"
     else:
         return "info"
+
+def _map_dart_severity(severity_type: str) -> str:
+    """Map dart severity levels to standard severity levels."""
+    severity_map = {
+        "info": "info",
+        "warning": "warning",
+        "error": "error",
+    }
+    return severity_map.get(severity_type.lower(), "info")
 
 def _format_lint_results(issues: List[Dict[str, Any]]) -> str:
     """Format linting issues into a readable text output."""

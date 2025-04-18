@@ -276,6 +276,7 @@ A detailed report of linting issues found in the codebase, including file paths,
 
 -   Python: pylint, flake8 (automatically uses what's available)
 -   JavaScript/TypeScript: ESLint
+-   Dart/Flutter: dart_analyze (also reports compilation errors)
 
 **Example Usage:**
 
@@ -297,6 +298,15 @@ skydeckai-code-cli --tool check_lint --args '{
     "languages": ["python"],
     "linters": {
         "flake8": false
+    }
+}'
+
+# Check Dart/Flutter files for linting and compilation errors
+skydeckai-code-cli --tool check_lint --args '{
+    "path": "lib",
+    "languages": ["dart"],
+    "linters": {
+        "dart_analyze": "--fatal-infos"
     }
 }'
 ```

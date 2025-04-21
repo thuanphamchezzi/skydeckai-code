@@ -822,11 +822,41 @@ async def apply_file_edits(file_path: str, edits: List[dict], dry_run: bool = Fa
         start, end, confidence = find_best_match(working_content, search_text, partial_match)
 
         if confidence >= 0.8:
-            # Always preserve indentation of first line
+            # Fix indentation while preserving relative structure
             if start >= 0:
-                indent = re.match(r'^\s*', modified_content[start:].splitlines()[0]).group(0)
-                replacement = '\n'.join(indent + line.lstrip()
-                                      for line in new_text.splitlines())
+                # Get the indentation of the first line of the matched text
+                base_indent = re.match(r'^\s*', modified_content[start:].splitlines()[0]).group(0)
+
+                # Split the new text into lines
+                new_lines = new_text.splitlines()
+
+                # If there are multiple lines, adjust indentation while preserving structure
+                if len(new_lines) > 1:
+                    # Find the minimum indentation level in the new text (ignoring empty lines)
+                    non_empty_lines = [line for line in new_lines if line.strip()]
+                    if non_empty_lines:
+                        min_indent_length = min(len(re.match(r'^\s*', line).group(0)) for line in non_empty_lines)
+                    else:
+                        min_indent_length = 0
+
+                    # Process each line to preserve relative indentation
+                    processed_lines = []
+                    for line in new_lines:
+                        if line.strip():  # If line is not empty
+                            # Get current indentation
+                            current_indent = re.match(r'^\s*', line).group(0)
+                            # Calculate relative indentation
+                            relative_indent = len(current_indent) - min_indent_length
+                            # Apply base indent plus relative indent
+                            processed_lines.append(base_indent + ' ' * relative_indent + line.lstrip())
+                        else:
+                            # For empty lines, just use base indentation
+                            processed_lines.append(base_indent)
+
+                    replacement = '\n'.join(processed_lines)
+                else:
+                    # Single line - just use base indentation
+                    replacement = base_indent + new_text.lstrip()
             else:
                 replacement = new_text
 

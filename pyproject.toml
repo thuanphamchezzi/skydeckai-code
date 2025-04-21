@@ -1,6 +1,6 @@
 [project]
 name = "skydeckai-code"
-version = "0.1.32"
+version = "0.1.33"
 description = "This MCP server provides a comprehensive set of tools for AI-driven Development workflows including file operations, code analysis, code linting, multi-language execution, Git operations, web content fetching with HTML-to-markdown conversion, multi-engine web search, code content searching, and system information retrieval."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -61,6 +61,11 @@ Documentation = "https://github.com/skydeckai/skydeckai-code/blob/main/README.md
 [build-system]
 requires = [ "hatchling",]
 build-backend = "hatchling.build"
+
+# Configures the src-layout package discovery
+[tool.hatch.packages.find]
+where = ["src"]
+namespaces = false
 
 [project.scripts]
 skydeckai-code = "aidd:main"

@@ -55,27 +55,32 @@ If you're using SkyDeck AI Helper app, you can search for "SkyDeckAI Code" and i
 
 ### Basic File Operations
 
-| Tool                | Parameters                                               | Returns                                       |
-| ------------------- | -------------------------------------------------------- | --------------------------------------------- |
-| read_file           | path: string, offset?: integer, limit?: integer          | File content (whole or partial)               |
-| read_multiple_files | paths: string[]                                          | Multiple file contents with headers           |
-| write_file          | path: string, content: string                            | Success confirmation                          |
-| move_file           | source: string, destination: string                      | Success confirmation                          |
-| copy_file           | source: string, destination: string, recursive?: boolean | Success confirmation                          |
-| delete_file         | path: string                                             | Success confirmation                          |
-| get_file_info       | path: string                                             | File metadata (size, timestamps, permissions) |
+| Tool          | Parameters                                                 | Returns                                       |
+| ------------- | ---------------------------------------------------------- | --------------------------------------------- |
+| read_file     | files: [{path: string, offset?: integer, limit?: integer}] | File content (single or multiple files)       |
+| write_file    | path: string, content: string                              | Success confirmation                          |
+| move_file     | source: string, destination: string                        | Success confirmation                          |
+| copy_file     | source: string, destination: string, recursive?: boolean   | Success confirmation                          |
+| delete_file   | path: string                                               | Success confirmation                          |
+| get_file_info | path: string                                               | File metadata (size, timestamps, permissions) |
 
 Common usage:
 
 ```bash
 # Read entire file
-skydeckai-code-cli --tool read_file --args '{"path": "src/main.py"}'
+skydeckai-code-cli --tool read_file --args '{"files": [{"path": "src/main.py"}]}'
 
 # Read 10 lines starting from line 20
-skydeckai-code-cli --tool read_file --args '{"path": "src/main.py", "offset": 20, "limit": 10}'
+skydeckai-code-cli --tool read_file --args '{"files": [{"path": "src/main.py", "offset": 20, "limit": 10}]}'
 
 # Read from line 50 to the end of the file
-skydeckai-code-cli --tool read_file --args '{"path": "src/main.py", "offset": 50}'
+skydeckai-code-cli --tool read_file --args '{"files": [{"path": "src/main.py", "offset": 50}]}'
+
+# Read multiple files with different line ranges
+skydeckai-code-cli --tool read_file --args '{"files": [
+  {"path": "src/main.py", "offset": 1, "limit": 10},
+  {"path": "README.md"}
+]}'
 
 # Write file
 skydeckai-code-cli --tool write_file --args '{"path": "output.txt", "content": "Hello World"}'

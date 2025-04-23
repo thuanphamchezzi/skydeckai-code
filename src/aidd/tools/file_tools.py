@@ -17,32 +17,43 @@ from .state import state
 def read_file_tool():
     return {
         "name": "read_file",
-        "description": "Read the contents of a file from the file system. "
-                    "WHEN TO USE: When you need to examine the actual content of a single file, view source code, check configuration files, or analyze text data. "
+        "description": "Read the contents of one or more files from the file system. "
+                    "WHEN TO USE: When you need to examine the actual content of one or more files, view source code, check configuration files, or analyze text data. "
                     "This is the primary tool for accessing file contents directly. "
                     "WHEN NOT TO USE: When you only need file metadata like size or modification date (use get_file_info instead), when you need to list directory contents "
-                    "(use directory_listing instead), or when you need to read multiple files at once (use read_multiple_files instead). "
-                    "RETURNS: The complete text content of the specified file or the requested portion if offset/limit are specified. Binary files or files with unknown encodings will return an error message. "
-                    "Handles various text encodings and provides detailed error messages if the file cannot be read. Only works within the allowed directory. "
-                    "Example: Enter 'src/main.py' to read a Python file, or add offset/limit to read specific line ranges. "
-                    "TIP: When analyzing a codebase, it's more efficient to use read_multiple_files instead of reading files one by one.",
+                    "(use directory_listing instead). "
+                    "RETURNS: The complete text content of the specified file(s) or the requested portion if offset/limit are specified. Binary files or files with unknown encodings will return an error message. "
+                    "Each file's content is preceded by a header showing the file path (==> path/to/file <==). "
+                    "Handles various text encodings and provides detailed error messages if a file cannot be read. Only works within the allowed directory. "
+                    "Example: Use 'files: [{\"path\": \"src/main.py\"}]' to read a Python file, or add offset/limit to read specific line ranges. "
+                    "For multiple files, use 'files: [{\"path\": \"file1.txt\"}, {\"path\": \"file2.txt\"}]' with optional offset/limit for each file.",
         "inputSchema": {
             "type": "object",
             "properties": {
-                "path": {
-                    "type": "string",
-                    "description": "Path to the file to read. This must be a path to a file, not a directory. Examples: 'README.md', 'src/main.py', 'config.json'. Both absolute and relative paths are supported, but must be within the allowed workspace."
-                },
-                "offset": {
-                    "type": "integer",
-                    "description": "Line number to start reading from (1-indexed). If specified, the file will be read starting from this line. Default is to start from the beginning of the file.",
-                },
-                "limit": {
-                    "type": "integer",
-                    "description": "Maximum number of lines to read after the offset. If specified along with offset, only this many lines will be read. Default is to read to the end of the file.",
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "path": {
+                                "type": "string",
+                                "description": "Path to the file to read. This must be a path to a file, not a directory. Examples: 'README.md', 'src/main.py', 'config.json'. Both absolute and relative paths are supported, but must be within the allowed workspace."
+                            },
+                            "offset": {
+                                "type": "integer",
+                                "description": "Line number to start reading from (1-indexed). If specified, the file will be read starting from this line. Default is to start from the beginning of the file."
+                            },
+                            "limit": {
+                                "type": "integer",
+                                "description": "Maximum number of lines to read after the offset. If specified along with offset, only this many lines will be read. Default is to read to the end of the file."
+                            }
+                        },
+                        "required": ["path"]
+                    },
+                    "description": "List of files to read with optional offset and limit for each file."
                 }
             },
-            "required": ["path"]
+            "required": ["files"]
         },
     }
 
@@ -215,31 +226,6 @@ def delete_file_tool():
         },
     }
 
-def read_multiple_files_tool():
-    return {
-        "name": "read_multiple_files",
-        "description": "Read the contents of multiple files simultaneously. "
-                    "WHEN TO USE: When you need to examine or compare multiple files at once, analyze related files together, or gather content from several files efficiently. "
-                    "Useful for understanding code across multiple files, comparing configuration files, or collecting information from related documents. "
-                    "WHEN NOT TO USE: When you only need to read a single file (use read_file instead), when you need to read binary files or images (use read_image_file instead), "
-                    "or when you need metadata about files rather than their contents (use get_file_info instead). "
-                    "RETURNS: The contents of all specified files, with each file's content preceded by a header showing its path (==> path/to/file <==). "
-                    "If an individual file cannot be read, an error message is included in its place, but the operation continues for other files. "
-                    "Failed reads for individual files won't stop the entire operation. Only works within the allowed directory. "
-                    "Example: Enter ['src/main.py', 'README.md'] to read both files.",
-        "inputSchema": {
-            "type": "object",
-            "properties": {
-                "paths": {
-                    "type": "array",
-                    "items": {"type": "string"},
-                    "description": "List of file paths to read. Must contain at least one path. Each path should point to a text file. Examples: ['README.md', 'package.json'], ['src/main.py', 'src/utils.py', 'config.ini']. Both absolute and relative paths are supported, but must be within the allowed workspace.",
-                }
-            },
-            "required": ["paths"]
-        },
-    }
-
 def edit_file_tool():
     return {
         "name": "edit_file",
@@ -396,41 +382,43 @@ async def handle_write_file(arguments: dict):
         raise ValueError(f"Error writing file: {str(e)}")
 
 async def handle_read_file(arguments: dict):
-    path = arguments.get("path")
-    if not path:
-        raise ValueError("path must be provided")
+    files = arguments.get("files")
+    if not files:
+        raise ValueError("files must be provided")
+    if not isinstance(files, list):
+        raise ValueError("files must be an array")
+    if not files:
+        raise ValueError("files array cannot be empty")
 
-    # Get the line range parameters
-    offset = arguments.get("offset")
-    limit = arguments.get("limit")
+    # Validate each file entry
+    for file_entry in files:
+        if not isinstance(file_entry, dict):
+            raise ValueError("each file entry must be an object")
+        if "path" not in file_entry:
+            raise ValueError("each file entry must have a path property")
 
-    return await _read_single_file(path, offset, limit)
-
-async def handle_read_multiple_files(arguments: dict):
-    paths = arguments.get("paths", [])
-    if not isinstance(paths, list):
-        raise ValueError("paths must be a list of strings")
-    if not all(isinstance(p, str) for p in paths):
-        raise ValueError("all paths must be strings")
-    if not paths:
-        raise ValueError("paths list cannot be empty")
-
+    # Read each file with its own offset/limit
     results = []
-    for path in paths:
+    for file_entry in files:
+        path = file_entry.get("path")
+        offset = file_entry.get("offset")
+        limit = file_entry.get("limit")
+
         try:
             # Add file path header first
             results.append(TextContent(
                 type="text",
                 text=f"\n==> {path} <==\n"
             ))
-            # Then add file contents
-            file_contents = await _read_single_file(path)
+            # Then add file contents with specific offset/limit
+            file_contents = await _read_single_file(path, offset, limit)
             results.extend(file_contents)
         except Exception as e:
             results.append(TextContent(
                 type="text",
                 text=f"Error: {str(e)}\n"
             ))
+
     return results
 
 async def handle_move_file(arguments: dict):

@@ -199,7 +199,7 @@ Fast content search tool using regular expressions:
 
 ```json
 {
-    "pattern": "function\\s+\\w+",
+    "patterns": ["function\\s+\\w+", "class\\s+\\w+"],
     "include": "*.js",
     "exclude": "node_modules/**",
     "max_results": 50,
@@ -211,10 +211,10 @@ Fast content search tool using regular expressions:
 **Parameters:**
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| pattern | string | Yes | Regular expression pattern to search in file contents |
+| patterns | array of strings | Yes | List of regular expression patterns to search for in file contents |
 | include | string | No | File pattern to include (glob syntax, default: "\*") |
 | exclude | string | No | File pattern to exclude (glob syntax, default: "") |
-| max_results | integer | No | Maximum results to return (default: 100) |
+| max_results | integer | No | Maximum results to return per pattern (default: 100) |
 | case_sensitive | boolean | No | Whether search is case-sensitive (default: false) |
 | path | string | No | Base directory to search from (default: ".") |
 
@@ -226,21 +226,21 @@ This tool uses ripgrep when available for optimal performance, with a Python fal
 **Example Usage:**
 
 ```bash
-# Find function declarations in JavaScript files
+# Find function and class declarations in JavaScript files
 skydeckai-code-cli --tool search_code --args '{
-    "pattern": "function\\s+\\w+",
+    "patterns": ["function\\s+\\w+", "class\\s+\\w+"],
     "include": "*.js"
 }'
 
-# Find all console.log statements with errors
+# Find all console.log statements with errors or warnings
 skydeckai-code-cli --tool search_code --args '{
-    "pattern": "console\\.log.*[eE]rror",
+    "patterns": ["console\\.log.*[eE]rror", "console\\.log.*[wW]arning"],
     "path": "src"
 }'
 
-# Find import statements in TypeScript files
+# Find import and export statements in TypeScript files
 skydeckai-code-cli --tool search_code --args '{
-    "pattern": "import.*from",
+    "patterns": ["import.*from", "export.*"],
     "include": "*.{ts,tsx}",
     "exclude": "node_modules/**"
 }'

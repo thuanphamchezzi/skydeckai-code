@@ -24,7 +24,8 @@ def read_file_tool():
                     "(use directory_listing instead), or when you need to read multiple files at once (use read_multiple_files instead). "
                     "RETURNS: The complete text content of the specified file or the requested portion if offset/limit are specified. Binary files or files with unknown encodings will return an error message. "
                     "Handles various text encodings and provides detailed error messages if the file cannot be read. Only works within the allowed directory. "
-                    "Example: Enter 'src/main.py' to read a Python file, or add offset/limit to read specific line ranges.",
+                    "Example: Enter 'src/main.py' to read a Python file, or add offset/limit to read specific line ranges. "
+                    "TIP: When analyzing a codebase, it's more efficient to use read_multiple_files instead of reading files one by one.",
         "inputSchema": {
             "type": "object",
             "properties": {

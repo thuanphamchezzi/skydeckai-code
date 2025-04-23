@@ -20,17 +20,19 @@ def search_code_tool():
                     "WHEN NOT TO USE: When you need to find files by name (use search_files instead), when you need "
                     "semantic code understanding (use codebase_mapper instead), or when analyzing individual file "
                     "structure. "
-                    "RETURNS: Lines of code matching the specified pattern, grouped by file with line numbers. "
+                    "RETURNS: Lines of code matching the specified patterns, grouped by file with line numbers. "
                     "Results are sorted by file modification time with newest files first. Respects file filtering "
                     "and ignores binary files. Search is restricted to the allowed directory.",
         "inputSchema": {
             "type": "object",
             "properties": {
-                "pattern": {
-                    "type": "string",
-                    "description": "Regular expression pattern to search for in file contents. Supports full regex syntax. "
-                                   "Examples: 'function\\s+\\w+' to find function declarations, 'import\\s+.*from' to find "
-                                   "import statements, 'console\\.log.*Error' to find error logs."
+                "patterns": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "List of regular expression patterns to search for in file contents. Supports full regex syntax. "
+                                   "Examples: ['function\\s+\\w+', 'class\\s+\\w+'] to find both function and class declarations."
                 },
                 "include": {
                     "type": "string",
@@ -47,7 +49,7 @@ def search_code_tool():
                 },
                 "max_results": {
                     "type": "integer",
-                    "description": "Maximum number of matching results to return. Use to limit output size for common patterns. "
+                    "description": "Maximum number of matching results to return per pattern. Use to limit output size for common patterns. "
                                    "Default is 100, which is sufficient for most searches while preventing excessive output.",
                     "default": 100
                 },
@@ -65,22 +67,22 @@ def search_code_tool():
                     "default": "."
                 }
             },
-            "required": ["pattern"]
+            "required": ["patterns"]
         }
     }
 
 
 async def handle_search_code(arguments: dict) -> List[TextContent]:
     """Handle searching for patterns in code files."""
-    pattern = arguments.get("pattern")
+    patterns = arguments.get("patterns", [])
     include = arguments.get("include", "*")
     exclude = arguments.get("exclude", "")
     max_results = arguments.get("max_results", 100)
     case_sensitive = arguments.get("case_sensitive", False)
     path = arguments.get("path", ".")
 
-    if not pattern:
-        raise ValueError("Pattern must be provided")
+    if not patterns:
+        raise ValueError("At least one pattern must be provided")
 
     # Determine full path for search start
     if os.path.isabs(path):
@@ -97,17 +99,36 @@ async def handle_search_code(arguments: dict) -> List[TextContent]:
     if not os.path.isdir(full_path):
         raise ValueError(f"Path is not a directory: {path}")
 
+    # Results from all patterns
+    all_results = []
+
     try:
-        # Use ripgrep if available for faster results
-        try:
-            return await _search_with_ripgrep(
-                pattern, include, exclude, max_results, case_sensitive, full_path
-            )
-        except (subprocess.SubprocessError, FileNotFoundError):
-            # Fallback to Python implementation if ripgrep not available
-            return await _search_with_python(
-                pattern, include, exclude, max_results, case_sensitive, full_path
-            )
+        for i, pattern in enumerate(patterns):
+            pattern_header = f"\n{'='*30}\nPattern {i+1}: {pattern}\n{'='*30}\n" if len(patterns) > 1 else ""
+            try:
+                # Use ripgrep if available for faster results
+                try:
+                    result = await _search_with_ripgrep(
+                        pattern, include, exclude, max_results, case_sensitive, full_path
+                    )
+                except (subprocess.SubprocessError, FileNotFoundError):
+                    # Fallback to Python implementation if ripgrep not available
+                    result = await _search_with_python(
+                        pattern, include, exclude, max_results, case_sensitive, full_path
+                    )
+
+                # Add pattern header for multiple patterns
+                if len(patterns) > 1 and result and result[0].text != f"No matches found for pattern '{pattern}'.":
+                    result[0].text = pattern_header + result[0].text
+
+                all_results.extend(result)
+            except Exception as e:
+                all_results.append(TextContent(
+                    type="text",
+                    text=f"{pattern_header}Error searching for pattern '{pattern}': {str(e)}"
+                ))
+
+        return all_results
     except Exception as e:
         raise ValueError(f"Error searching code: {str(e)}")
 
@@ -193,9 +214,17 @@ async def _search_with_ripgrep(
 
         # Format output
         formatted_output = []
+        match_count = 0
         for file_path, data in sorted_files:
             formatted_output.append(f"\n{file_path} (modified: {datetime.fromtimestamp(data['mod_time']).strftime('%Y-%m-%d %H:%M:%S')})")
             formatted_output.extend(data["matches"])
+            match_count += len(data["matches"])
+
+        summary = f"Found {match_count} matches in {len(sorted_files)} files for pattern '{pattern}'"
+        if match_count > 0:
+            formatted_output.insert(0, summary)
+        else:
+            formatted_output = [summary]
 
         return [TextContent(
             type="text",
@@ -207,7 +236,7 @@ async def _search_with_ripgrep(
             # ripgrep returns 1 when no matches are found
             return [TextContent(
                 type="text",
-                text="No matches found."
+                text=f"No matches found for pattern '{pattern}'."
             )]
         raise
 
@@ -310,7 +339,7 @@ async def _search_with_python(
     if not files_with_matches:
         return [TextContent(
             type="text",
-            text="No matches found."
+            text=f"No matches found for pattern '{pattern}'."
         )]
 
     # Sort files by modification time (newest first)
@@ -322,10 +351,21 @@ async def _search_with_python(
 
     # Format output
     formatted_output = []
+    total_matches = 0
+    files_with_actual_matches = 0
+
     for file_path, data in sorted_files:
         if data["matches"]:  # Only include files that actually have matches
             formatted_output.append(f"\n{file_path} (modified: {datetime.fromtimestamp(data['mod_time']).strftime('%Y-%m-%d %H:%M:%S')})")
             formatted_output.extend(data["matches"])
+            total_matches += len(data["matches"])
+            files_with_actual_matches += 1
+
+    summary = f"Found {total_matches} matches in {files_with_actual_matches} files for pattern '{pattern}'"
+    if total_matches > 0:
+        formatted_output.insert(0, summary)
+    else:
+        formatted_output = [summary]
 
     return [TextContent(
         type="text",

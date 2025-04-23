@@ -100,6 +100,9 @@ def execute_shell_script_tool() -> Dict[str, Any]:
             "Execute a shell script (bash/sh) on the user's local machine within the current working directory. "
             "WHEN TO USE: When you need to automate system tasks, run shell commands, interact with the operating system, or perform operations "
             "that are best expressed as shell commands. Useful for file system operations, system configuration, or running system utilities. "
+            "Also ideal when you need to run code linters to check for style issues or potential bugs in the codebase, "
+            "or when you need to perform version control operations such as initializing git repositories, checking status, "
+            "committing changes, cloning repositories, and other git commands without dedicated tools. "
             "WHEN NOT TO USE: When you need more structured programming (use execute_code instead), when you need to execute potentially "
             "dangerous system operations, or when you want to run commands outside the allowed directory. "
             "RETURNS: Text output including stdout, stderr, and exit code of the execution. The output sections are clearly labeled with "
@@ -110,6 +113,8 @@ def execute_shell_script_tool() -> Dict[str, Any]:
             "Examples: "
             "- script='echo \"Current directory:\" && pwd'. "
             "- script='for i in {1..5}; do echo $i; done'. "
+            "- script='eslint src/ --format stylish' (for linting). "
+            "- script='git init && git add . && git commit -m \"Initial commit\"' (for git operations)."
         ),
         "inputSchema": {
             "type": "object",

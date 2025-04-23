@@ -1,6 +1,6 @@
 # SkyDeckAI Code
 
-An MCP server that provides a comprehensive set of tools for AI-driven development workflows. Features include file system operations, code analysis using tree-sitter for multiple programming languages, Git operations, code execution, web content fetching with HTML-to-markdown conversion, multi-engine web search, code content searching, and system information retrieval. Designed to enhance AI's capability to assist in software development tasks by providing direct access to both local and remote resources.
+An MCP server that provides a comprehensive set of tools for AI-driven development workflows. Features include file system operations, code analysis using tree-sitter for multiple programming languages, code execution, web content fetching with HTML-to-markdown conversion, multi-engine web search, code content searching, and system information retrieval. Designed to enhance AI's capability to assist in software development tasks by providing direct access to both local and remote resources.
 
 # Formerly Known As MCP-Server-AIDD
 
@@ -44,7 +44,6 @@ If you're using SkyDeck AI Helper app, you can search for "SkyDeckAI Code" and i
 -   Code linting and issue detection for Python and JavaScript/TypeScript
 -   Code content searching with regex pattern matching
 -   Multi-language code execution with safety measures
--   Git operations (status, diff, commit, branch management, cloning)
 -   Web content fetching from APIs and websites with HTML-to-markdown conversion
 -   Multi-engine web search with reliable fallback mechanisms
 -   Batch operations for parallel and serial tool execution
@@ -145,69 +144,6 @@ skydeckai-code-cli --tool list_directory --args '{"path": "."}'
 
 # Search for Python files
 skydeckai-code-cli --tool search_files --args '{"pattern": ".py", "path": "src"}'
-```
-
-### Git Operations
-
-| Tool              | Parameters                                        | Returns                          |
-| ----------------- | ------------------------------------------------- | -------------------------------- |
-| git_init          | path: string, initial_branch?: string             | Repository initialization status |
-| git_status        | repo_path: string                                 | Working directory status         |
-| git_add           | repo_path: string, files: string[]                | Staging confirmation             |
-| git_reset         | repo_path: string                                 | Unstaging confirmation           |
-| git_checkout      | repo_path: string, branch_name: string            | Branch switch confirmation       |
-| git_create_branch | repo_path: string, branch_name: string            | Branch creation confirmation     |
-| git_clone         | url: string, target_path: string, branch?: string | Clone confirmation               |
-| git_diff_unstaged | repo_path: string                                 | Unstaged changes diff            |
-| git_diff_staged   | repo_path: string                                 | Staged changes diff              |
-| git_show          | repo_path: string, commit_hash: string            | Details of a specific commit     |
-
-#### Complex Git Operations
-
-##### git_commit
-
-```json
-{
-    "repo_path": ".",
-    "message": "feat: add new feature"
-}
-```
-
-Returns: Commit hash and confirmation.
-
-##### git_diff
-
-```json
-{
-    "repo_path": ".",
-    "target": "main"
-}
-```
-
-Returns: Detailed diff output showing all changes between the current branch and the specified target branch or commit.
-
-##### git_log
-
-```json
-{
-    "repo_path": ".",
-    "max_count": 10
-}
-```
-
-Returns: Array of commit entries with hash, author, date, and message.
-
-Common usage:
-
-```bash
-# Check status
-skydeckai-code-cli --tool git_status --args '{"repo_path": "."}'
-
-# Clone a repository
-skydeckai-code-cli --tool git_clone --args '{"url": "https://github.com/username/repo.git", "target_path": "repo"}'
-
-# Create and switch to new branch
-skydeckai-code-cli --tool git_create_branch --args '{"repo_path": ".", "branch_name": "feature/new-branch"}'
 ```
 
 ### Code Analysis
@@ -602,10 +538,9 @@ Execute multiple tool invocations in a single request with parallel execution wh
             }
         },
         {
-            "tool": "git_init",
+            "tool": "execute_shell_script",
             "arguments": {
-                "path": ".",
-                "initial_branch": "main"
+                "script": "git init"
             }
         }
     ]

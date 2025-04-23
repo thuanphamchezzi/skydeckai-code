@@ -36,34 +36,6 @@ from .file_tools import (
 )
 from .get_active_apps_tool import get_active_apps_tool, handle_get_active_apps
 from .get_available_windows_tool import get_available_windows_tool, handle_get_available_windows
-from .git_tools import (
-    git_add_tool,
-    git_checkout_tool,
-    git_clone_tool,
-    git_commit_tool,
-    git_create_branch_tool,
-    git_diff_staged_tool,
-    git_diff_tool,
-    git_diff_unstaged_tool,
-    git_init_tool,
-    git_log_tool,
-    git_reset_tool,
-    git_show_tool,
-    git_status_tool,
-    handle_git_add,
-    handle_git_checkout,
-    handle_git_clone,
-    handle_git_commit,
-    handle_git_create_branch,
-    handle_git_diff,
-    handle_git_diff_staged,
-    handle_git_diff_unstaged,
-    handle_git_init,
-    handle_git_log,
-    handle_git_reset,
-    handle_git_show,
-    handle_git_status,
-)
 from .image_tools import read_image_file_tool, handle_read_image_file
 from .other_tools import batch_tools_tool, handle_batch_tools, think_tool, handle_think
 from .path_tools import (
@@ -101,21 +73,6 @@ TOOL_DEFINITIONS = [
     search_code_tool(),
     batch_tools_tool(),
     think_tool(),
-    # Git tools
-    git_init_tool(),
-    git_status_tool(),
-    git_diff_unstaged_tool(),
-    git_diff_staged_tool(),
-    git_diff_tool(),
-    git_commit_tool(),
-    git_add_tool(),
-    git_reset_tool(),
-    git_log_tool(),
-    git_create_branch_tool(),
-    git_checkout_tool(),
-    git_clone_tool(),
-    git_show_tool(),
-    get_system_info_tool(),
     # Screenshot tools
     capture_screenshot_tool(),
     # System context tools
@@ -126,6 +83,8 @@ TOOL_DEFINITIONS = [
     # Web tools
     web_fetch_tool(),
     web_search_tool(),
+    # System tools
+    get_system_info_tool(),
 ]
 
 # Export all handlers
@@ -150,20 +109,6 @@ TOOL_HANDLERS = {
     "codebase_mapper": handle_codebase_mapper,
     "batch_tools": handle_batch_tools,
     "think": handle_think,
-    # Git handlers
-    "git_init": handle_git_init,
-    "git_status": handle_git_status,
-    "git_diff_unstaged": handle_git_diff_unstaged,
-    "git_diff_staged": handle_git_diff_staged,
-    "git_diff": handle_git_diff,
-    "git_commit": handle_git_commit,
-    "git_add": handle_git_add,
-    "git_reset": handle_git_reset,
-    "git_log": handle_git_log,
-    "git_create_branch": handle_git_create_branch,
-    "git_checkout": handle_git_checkout,
-    "git_clone": handle_git_clone,
-    "git_show": handle_git_show,
     "get_system_info": handle_get_system_info,
     # Screenshot handlers
     "capture_screenshot": handle_capture_screenshot,

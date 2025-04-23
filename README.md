@@ -1,6 +1,6 @@
 # SkyDeckAI Code
 
-An MCP server that provides a comprehensive set of tools for AI-driven development workflows. Features include file system operations, code analysis using tree-sitter for multiple programming languages, Git operations, code execution, web content fetching with HTML-to-markdown conversion, multi-engine web search, code content searching, linting detection, and system information retrieval. Designed to enhance AI's capability to assist in software development tasks by providing direct access to both local and remote resources.
+An MCP server that provides a comprehensive set of tools for AI-driven development workflows. Features include file system operations, code analysis using tree-sitter for multiple programming languages, Git operations, code execution, web content fetching with HTML-to-markdown conversion, multi-engine web search, code content searching, and system information retrieval. Designed to enhance AI's capability to assist in software development tasks by providing direct access to both local and remote resources.
 
 # Formerly Known As MCP-Server-AIDD
 
@@ -233,8 +233,8 @@ Returns:
 Supported Languages:
 
 -   Python (.py)
--   JavaScript (.js, .jsx, .mjs, .cjs)
--   TypeScript (.ts, .tsx)
+-   JavaScript (.js/.jsx, .mjs, .cjs)
+-   TypeScript (.ts/.tsx)
 -   Java (.java)
 -   C++ (.cpp, .hpp, .cc)
 -   Ruby (.rb, .rake)
@@ -244,71 +244,17 @@ Supported Languages:
 -   C# (.cs)
 -   Kotlin (.kt, .kts)
 
-#### check_lint
-
-Check for linting issues in your codebase using native linting tools:
-
-```json
-{
-    "path": "src",
-    "languages": ["python", "javascript"],
-    "linters": {
-        "pylint": "--disable=C0111",
-        "flake8": true,
-        "eslint": "--fix"
-    },
-    "max_issues": 100
-}
-```
-
-**Parameters:**
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| path | string | No | Directory or file to lint (default: ".") |
-| languages | array | No | List of languages to lint (auto-detects if empty) |
-| linters | object | No | Configuration for specific linters - can use booleans or CLI arguments |
-| max_issues | integer | No | Maximum number of issues to return (default: 100, 0 for unlimited) |
-
-**Returns:**
-A detailed report of linting issues found in the codebase, including file paths, line numbers, issue descriptions, and severity levels. Issues are grouped by file and sorted by severity.
-
-**Supported Languages and Linters:**
-
--   Python: pylint, flake8 (automatically uses what's available)
--   JavaScript/TypeScript: ESLint
--   Dart/Flutter: dart_analyze (also reports compilation errors)
-
 **Example Usage:**
 
 ```bash
-# Check entire codebase with default settings
-skydeckai-code-cli --tool check_lint
+# Map the entire codebase structure
+skydeckai-code-cli --tool codebase_mapper --args '{"path": "."}'
 
-# Check specific directory with custom pylint flags
-skydeckai-code-cli --tool check_lint --args '{
-    "path": "src",
-    "linters": {
-        "pylint": "--disable=missing-docstring,invalid-name"
-    }
-}'
+# Map only the source directory
+skydeckai-code-cli --tool codebase_mapper --args '{"path": "src"}'
 
-# Check only Python files and disable flake8
-skydeckai-code-cli --tool check_lint --args '{
-    "path": "src",
-    "languages": ["python"],
-    "linters": {
-        "flake8": false
-    }
-}'
-
-# Check Dart/Flutter files for linting and compilation errors
-skydeckai-code-cli --tool check_lint --args '{
-    "path": "lib",
-    "languages": ["dart"],
-    "linters": {
-        "dart_analyze": "--fatal-infos"
-    }
-}'
+# Map a specific component or module
+skydeckai-code-cli --tool codebase_mapper --args '{"path": "src/components"}'
 ```
 
 #### search_code

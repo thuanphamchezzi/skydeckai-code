@@ -65,7 +65,6 @@ from .git_tools import (
     handle_git_status,
 )
 from .image_tools import read_image_file_tool, handle_read_image_file
-from .lint_tools import check_lint_tool, handle_check_lint
 from .other_tools import batch_tools_tool, handle_batch_tools, think_tool, handle_think
 from .path_tools import (
     get_allowed_directory_tool,
@@ -100,7 +99,6 @@ TOOL_DEFINITIONS = [
     execute_shell_script_tool(),
     codebase_mapper_tool(),
     search_code_tool(),
-    check_lint_tool(),
     batch_tools_tool(),
     think_tool(),
     # Git tools
@@ -144,7 +142,6 @@ TOOL_HANDLERS = {
     "copy_file": handle_copy_file,
     "search_files": handle_search_files,
     "search_code": handle_search_code,
-    "check_lint": handle_check_lint,
     "delete_file": handle_delete_file,
     "get_file_info": handle_get_file_info,
     "directory_tree": handle_directory_tree,

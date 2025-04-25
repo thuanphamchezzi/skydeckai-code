@@ -51,7 +51,38 @@ If you're using SkyDeck AI Helper app, you can search for "SkyDeckAI Code" and i
 -   Screenshot and screen context tools
 -   Image handling tools
 
-## Available Tools
+## Available Tools (26)
+
+| Category         | Tool Name                  | Description                                  |
+| ---------------- | -------------------------- | -------------------------------------------- |
+| **File System**  | `get_allowed_directory`    | Get the current working directory path       |
+|                  | `update_allowed_directory` | Change the working directory                 |
+|                  | `create_directory`         | Create a new directory or nested directories |
+|                  | `write_file`               | Create or overwrite a file with new content  |
+|                  | `edit_file`                | Make line-based edits to a text file         |
+|                  | `read_file`                | Read the contents of one or more files       |
+|                  | `list_directory`           | Get listing of files and directories         |
+|                  | `move_file`                | Move or rename a file or directory           |
+|                  | `copy_file`                | Copy a file or directory to a new location   |
+|                  | `search_files`             | Search for files matching a name pattern     |
+|                  | `delete_file`              | Delete a file or empty directory             |
+|                  | `get_file_info`            | Get detailed file metadata                   |
+|                  | `directory_tree`           | Get a recursive tree view of directories     |
+|                  | `read_image_file`          | Read an image file as base64 data            |
+| **Code Tools**   | `codebase_mapper`          | Analyze code structure across files          |
+|                  | `search_code`              | Find text patterns in code files             |
+|                  | `execute_code`             | Run code in various languages                |
+|                  | `execute_shell_script`     | Run shell/bash scripts                       |
+| **Web Tools**    | `web_fetch`                | Get content from a URL                       |
+|                  | `web_search`               | Perform a web search                         |
+| **Screen Tools** | `capture_screenshot`       | Take a screenshot of screen or window        |
+|                  | `get_active_apps`          | List running applications                    |
+|                  | `get_available_windows`    | List all open windows                        |
+| **System**       | `get_system_info`          | Get detailed system information              |
+| **Utility**      | `batch_tools`              | Run multiple tool operations together        |
+|                  | `think`                    | Document reasoning without making changes    |
+
+## Detailed Tool Documentation
 
 ### Basic File Operations
 
@@ -64,7 +95,7 @@ If you're using SkyDeck AI Helper app, you can search for "SkyDeckAI Code" and i
 | delete_file   | path: string                                               | Success confirmation                          |
 | get_file_info | path: string                                               | File metadata (size, timestamps, permissions) |
 
-Common usage:
+**CLI Usage:**
 
 ```bash
 # Read entire file
@@ -141,7 +172,7 @@ Generates complete directory structure:
 
 Returns: JSON tree structure of directory contents.
 
-Common usage:
+**CLI Usage:**
 
 ```bash
 # List directory
@@ -185,7 +216,7 @@ Supported Languages:
 -   C# (.cs)
 -   Kotlin (.kt, .kts)
 
-**Example Usage:**
+**CLI Usage:**
 
 ```bash
 # Map the entire codebase structure
@@ -228,7 +259,7 @@ Matching lines grouped by file with line numbers, sorted by file modification ti
 
 This tool uses ripgrep when available for optimal performance, with a Python fallback implementation. It's ideal for finding specific code patterns like function declarations, imports, variable usages, or error handling.
 
-**Example Usage:**
+**CLI Usage:**
 
 ```bash
 # Find function and class declarations in JavaScript files
@@ -280,6 +311,8 @@ Returns:
 ```
 
 Provides essential system information in a clean, readable format.
+
+**CLI Usage:**
 
 ```bash
 # Get system information
@@ -449,7 +482,7 @@ Response content as text with HTTP status code and size information. For binary 
 
 This tool can be used to access web APIs, fetch documentation, or download content from the web while respecting size limits (10MB max) and security constraints.
 
-**Example Usage:**
+**CLI Usage:**
 
 ```bash
 # Fetch JSON from an API
@@ -497,7 +530,7 @@ A list of search results formatted in markdown, including titles, URLs, and snip
 
 This tool uses a multi-engine approach that tries different search engines with various parsing strategies to ensure reliable results. You can specify a preferred engine, but some engines may block automated access, in which case the tool will fall back to alternative engines when "auto" is selected.
 
-**Example Usage:**
+**CLI Usage:**
 
 ```bash
 # Search with default settings (auto engine selection)
@@ -571,7 +604,7 @@ This tool provides efficient execution of multiple operations in a single reques
 1. Use paths relative to the current working directory (e.g., "project/src" rather than just "src"), or
 2. Include an explicit tool invocation to change directories using `update_allowed_directory`
 
-**Example Usage:**
+**CLI Usage:**
 
 ```bash
 # Setup a new project with multiple steps in sequential order (using proper paths)
@@ -632,7 +665,7 @@ Your thoughts formatted as markdown, with a note indicating this was a thinking 
 
 This tool is useful for thinking through complex problems, brainstorming solutions, or laying out implementation plans without making any actual changes. It's a great way to document your reasoning process, evaluate different approaches, or plan out a multi-step strategy before taking action.
 
-**Example Usage:**
+**CLI Usage:**
 
 ```bash
 # Analyze a bug and plan a fix
@@ -676,7 +709,7 @@ Executes code in various programming languages with safety measures and restrict
 | code | string | Yes | Code to execute |
 | timeout | integer | No | Maximum execution time (default: 5s) |
 
-**Example Usage:**
+**CLI Usage:**
 
 ```bash
 # Python example
@@ -736,7 +769,7 @@ Executes shell scripts (bash/sh) with safety measures and restrictions.
 | script | string | Yes | Shell script to execute |
 | timeout | integer | No | Maximum execution time (default: 300s, max: 600s) |
 
-**Example Usage:**
+**CLI Usage:**
 
 ```bash
 # List directory contents with details

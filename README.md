@@ -41,7 +41,6 @@ If you're using SkyDeck AI Helper app, you can search for "SkyDeckAI Code" and i
 -   File system operations (read, write, edit, move, copy, delete)
 -   Directory management and traversal
 -   Multi-language code analysis using tree-sitter
--   Code linting and issue detection for Python and JavaScript/TypeScript
 -   Code content searching with regex pattern matching
 -   Multi-language code execution with safety measures
 -   Web content fetching from APIs and websites with HTML-to-markdown conversion

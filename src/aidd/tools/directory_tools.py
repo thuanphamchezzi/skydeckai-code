@@ -194,8 +194,7 @@ async def handle_directory_tree(arguments: dict):
     dir_cache = {"": root}
     try:
         paths = await git_ls(Path(full_path))
-        paths = [path for path in paths if len(path.parts) <= max_depth]
-        build_tree_from_paths(root, dir_cache, paths)
+        build_tree_from_paths(root, dir_cache, paths, max_depth)
         json_tree = json.dumps(root, indent=2)
         return [TextContent(type="text", text=json_tree)]
     except Exception:
@@ -218,8 +217,7 @@ async def handle_directory_tree(arguments: dict):
                 paths = scan_path([], absolute_git_repo)
         finally:
             paths = [git_repo / path for path in paths]
-            paths = [path for path in paths if len(path.parts) <= max_depth]
-            build_tree_from_paths(root, dir_cache, paths)
+            build_tree_from_paths(root, dir_cache, paths, max_depth)
 
     # for non-git directory, do normal scan
     non_git_scans = []
@@ -228,8 +226,7 @@ async def handle_directory_tree(arguments: dict):
     except Exception:
         non_git_scans = scan_path(git_repos, Path(full_path))
     finally:
-        paths = [path for path in non_git_scans if len(path.parts) <= max_depth]
-        build_tree_from_paths(root, dir_cache, paths)
+        build_tree_from_paths(root, dir_cache, non_git_scans, max_depth)
         json_tree = json.dumps(root, indent=2)
         return [TextContent(type="text", text=json_tree)]
 
@@ -337,7 +334,9 @@ async def git_ls(git_cwd: Path) -> list[Path]:
     return paths
 
 
-def build_tree_from_paths(root: dict, dir_cache: dict, paths: list[Path]):
+def build_tree_from_paths(root: dict, dir_cache: dict, paths: list[Path], max_depth: int):
+    paths = [path for path in paths if len(path.parts) <= max_depth]
+
     for path in paths:
         parts = path.parts
         current_path = ""

@@ -147,7 +147,8 @@ def directory_tree_tool():
         "RETURNS: JSON structure where each entry includes 'name', 'type' (file/directory), and 'children' for directories. "
         "Files have no children array, while directories always have a children array (which may be empty). "
         "The output is formatted with 2-space indentation for readability. For Git repositories, shows tracked files only. "
-        "Only works within the allowed directory. "
+        "Only works within the allowed directory and only for non-hidden files, or files that are not inside hidden directory. "
+        "If you want to show the hidden files also, use commands like execute_shell_script. "
         "Example: Enter '.' for current directory, or 'src' for a specific directory.",
         "inputSchema": {
             "type": "object",

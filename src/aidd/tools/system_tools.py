@@ -112,6 +112,9 @@ def get_system_details() -> Dict[str, Any]:
     """Gather detailed system information."""
 
     is_mac = platform.system() == "Darwin"
+    disk_total = psutil.disk_usage('/').total
+    disk_free = psutil.disk_usage('/').free
+    disk_used_percentage = (disk_total - disk_free) / disk_total * 100
 
     # System and OS Information
     system_info = {
@@ -142,7 +145,7 @@ def get_system_details() -> Dict[str, Any]:
         "disk": {
             "total": get_size(psutil.disk_usage('/').total),
             "free": get_size(psutil.disk_usage('/').free),
-            "used_percentage": f"{psutil.disk_usage('/').percent}%"
+            "used_percentage": f"{disk_used_percentage}%"
         }
     }
 

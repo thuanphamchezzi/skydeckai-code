@@ -252,10 +252,7 @@ async def execute_shell_script_in_temp_file(script: str, timeout: int) -> tuple[
         try:
             path_env = get_comprehensive_shell_paths()
             env = os.environ.copy()
-            with open("tmp.txt", "a") as f:
-                f.write(path_env)
             env["PATH"] = path_env
-            print(path_env)
             result = subprocess.run(
                 ["/bin/sh", temp_file],  # Use sh explicitly for consistent behavior
                 capture_output=True,

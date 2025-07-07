@@ -248,12 +248,12 @@ def todo_read_tool():
         "WHEN TO USE: When you need to check the current status of tasks, review what's pending "
         "or completed, or get context about ongoing work in this workspace. "
         "You can also use this tool to pick up your previous progress. "
-        "You must use this tool along with other todo tools everytime you interact with a workspace, "
-        "including explaining the workspace or developing with the workspace. "
         "WHEN NOT TO USE: When you want to update tasks (use todo_write instead). "
         "or you do not want to interact with current workspace. "
         "RETURNS: A list of todo objects with their current status, priority, and metadata. "
-        "Each workspace maintains its own isolated todo list.",
+        "Each workspace maintains its own isolated todo list. "
+        "IMPORTANT NOTE: You must use this tool along with other todo tools everytime you interact "
+        "with a workspace, including explaining the workspace or developing with the workspace.",
         "inputSchema": {
             "type": "object",
             "properties": {},
@@ -269,12 +269,12 @@ def todo_write_tool():
         "description": "Update the entire task list (complete replacement) for the current workspace. "
         "WHEN TO USE: When you need to add new tasks, update task status, modify priorities, "
         "or reorganize the task list. This replaces the entire list with validation. "
-        "You must use this tool along with other todo tools everytime you interact with a workspace, "
-        "including explaining the workspace or developing with the workspace. "
         "WHEN NOT TO USE: When you only want to read current tasks (use todo_read instead), "
         "or you do not want to interact with current workspace. "
         "RETURNS: Success status and count of tasks written. Enforces business rules like "
-        "unique IDs and single in-progress task constraint.",
+        "unique IDs and single in-progress task constraint. "
+        "IMPORTANT NOTE: You must use this tool along with other todo tools everytime you interact "
+        "with a workspace, including explaining the workspace or developing with the workspace.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -307,12 +307,12 @@ def todo_update_tool():
         "description": "Update a specific todo item by ID without replacing the entire list. "
         "WHEN TO USE: When you need to update specific fields of a single todo (status, priority, content, etc.). "
         "More efficient than todo_write when only updating one task. "
-        "You must use this tool along with other todo tools everytime you interact with a workspace, "
-        "including explaining the workspace or developing with the workspace. "
         "WHEN NOT TO USE: When you need to update multiple todos at once (use todo_write instead). "
         "or you do not want to interact with current workspace. "
         "RETURNS: The updated todo and status counts (pending, in_progress, completed). "
-        "Enforces business rules like unique IDs and single in-progress task constraint.",
+        "Enforces business rules like unique IDs and single in-progress task constraint. "
+        "IMPORTANT NOTE: You must use this tool along with other todo tools everytime you interact "
+        "with a workspace, including explaining the workspace or developing with the workspace.",
         "inputSchema": {
             "type": "object",
             "properties": {

@@ -21,8 +21,8 @@ class TodoStore:
 
     @property
     def todos_file_path(self) -> Path:
-        """Get the path to the todos file."""
-        return self.workspace_path / ".skydeckai-todos.json"
+        """Get the path to the global todos file."""
+        return state.config_dir / "todos.json"
 
     def _detect_workspace_change(self) -> bool:
         """Check if workspace has changed since last access."""
@@ -40,14 +40,20 @@ class TodoStore:
         if self._cached_store is not None:
             return self._cached_store
 
+        workspace_key = str(self.workspace_path)
+
         if not self.todos_file_path.exists():
             self._cached_store = {"lastModified": datetime.now().isoformat(), "todos": []}
             return self._cached_store
 
         try:
             with open(self.todos_file_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                self._cached_store = {"lastModified": data.get("lastModified", datetime.now().isoformat()), "todos": data.get("todos", [])}
+                global_data = json.load(f)
+                workspace_data = global_data.get(workspace_key, {})
+                self._cached_store = {
+                    "lastModified": workspace_data.get("lastModified", datetime.now().isoformat()), 
+                    "todos": workspace_data.get("todos", [])
+                }
                 return self._cached_store
         except (json.JSONDecodeError, IOError, OSError):
             # Return empty store if file is corrupted
@@ -56,23 +62,35 @@ class TodoStore:
 
     def _save_store(self, store: Dict[str, Any]) -> None:
         """Save todos to file atomically."""
-        self.workspace_path.mkdir(exist_ok=True)
+        # Ensure the ~/.skydeckai-code directory exists
+        self.todos_file_path.parent.mkdir(exist_ok=True)
+
+        workspace_key = str(self.workspace_path)
+
+        # Load existing global data
+        global_data = {}
+        if self.todos_file_path.exists():
+            try:
+                with open(self.todos_file_path, "r", encoding="utf-8") as f:
+                    global_data = json.load(f)
+            except (json.JSONDecodeError, IOError, OSError):
+                global_data = {}
+
+        # Update the workspace data
+        global_data[workspace_key] = store
 
         # Write to temporary file first (atomic write)
         temp_path = self.todos_file_path.with_suffix(".json.tmp")
 
         try:
             with open(temp_path, "w", encoding="utf-8") as f:
-                json.dump(store, f, indent=2, ensure_ascii=False)
+                json.dump(global_data, f, indent=2, ensure_ascii=False)
 
             # Atomic rename
             temp_path.replace(self.todos_file_path)
 
             # Update cache
             self._cached_store = store
-
-            # Add to .gitignore if first time
-            self._add_to_gitignore()
 
         except Exception:
             # Clean up temp file if something went wrong
@@ -81,27 +99,8 @@ class TodoStore:
             raise
 
     def _add_to_gitignore(self) -> None:
-        """Add todos file to .gitignore if not already present."""
-        gitignore_path = self.workspace_path / ".gitignore"
-        target_line = ".skydeckai-todos.json"
-
-        # Check if already in .gitignore
-        if gitignore_path.exists():
-            try:
-                with open(gitignore_path, "r", encoding="utf-8") as f:
-                    if target_line in f.read():
-                        return
-            except (IOError, OSError):
-                pass
-
-        # Add to .gitignore
-        try:
-            with open(gitignore_path, "a", encoding="utf-8") as f:
-                if gitignore_path.stat().st_size > 0:
-                    f.write("\n")
-                f.write(f"# SkyDeckAI todos\n{target_line}\n")
-        except (IOError, OSError):
-            pass  # Silently fail if can't write
+        """No longer needed since todos are stored in ~/.skydeckai-code/todo.json"""
+        pass
 
     def read_todos(self) -> List[Dict[str, Any]]:
         """Read all todos from storage."""
@@ -395,4 +394,3 @@ async def handle_todo_update(arguments: dict) -> list[TextContent]:
     except Exception as e:
         error_result = {"error": {"code": "VALIDATION_ERROR" if "validation" in str(e).lower() or "invalid" in str(e).lower() or "not found" in str(e).lower() else "UPDATE_ERROR", "message": str(e)}}
         return [TextContent(type="text", text=json.dumps(error_result, indent=2))]
-

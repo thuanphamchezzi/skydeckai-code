@@ -50,10 +50,7 @@ class TodoStore:
             with open(self.todos_file_path, "r", encoding="utf-8") as f:
                 global_data = json.load(f)
                 workspace_data = global_data.get(workspace_key, {})
-                self._cached_store = {
-                    "lastModified": workspace_data.get("lastModified", datetime.now().isoformat()), 
-                    "todos": workspace_data.get("todos", [])
-                }
+                self._cached_store = {"lastModified": workspace_data.get("lastModified", datetime.now().isoformat()), "todos": workspace_data.get("todos", [])}
                 return self._cached_store
         except (json.JSONDecodeError, IOError, OSError):
             # Return empty store if file is corrupted
@@ -140,47 +137,39 @@ class TodoStore:
         """Update a specific todo by ID."""
         store = self._load_store()
         todos = store["todos"]
-        
+
         # Find the todo to update
         todo_index = None
         for i, todo in enumerate(todos):
             if todo["id"] == todo_id:
                 todo_index = i
                 break
-        
+
         if todo_index is None:
             raise ValueError(f"Todo with ID '{todo_id}' not found")
-        
+
         # Create updated todo
         updated_todo = dict(todos[todo_index])
         updated_todo.update(updates)
         updated_todo["updated_at"] = datetime.now().isoformat()
-        
+
         # Replace the todo in the list
         updated_todos = todos.copy()
         updated_todos[todo_index] = updated_todo
-        
+
         # Validate the entire list with the update
         self._validate_todos(updated_todos)
-        
+
         # Save updated list
         new_store = {"lastModified": datetime.now().isoformat(), "todos": updated_todos}
         self._save_store(new_store)
-        
+
         # Return status counts
         pending_count = sum(1 for t in updated_todos if t["status"] == "pending")
         in_progress_count = sum(1 for t in updated_todos if t["status"] == "in_progress")
         completed_count = sum(1 for t in updated_todos if t["status"] == "completed")
-        
-        return {
-            "updated_todo": updated_todo,
-            "counts": {
-                "pending": pending_count,
-                "in_progress": in_progress_count,
-                "completed": completed_count,
-                "total": len(updated_todos)
-            }
-        }
+
+        return {"updated_todo": updated_todo, "counts": {"pending": pending_count, "in_progress": in_progress_count, "completed": completed_count, "total": len(updated_todos)}}
 
     def _validate_todos(self, todos: List[Dict[str, Any]]) -> None:
         """Validate todos according to business rules."""
@@ -245,15 +234,16 @@ def todo_read_tool():
     return {
         "name": "todo_read",
         "description": "Read the current task list from the workspace-specific todo storage. "
+        "MANDATORY: This tool MUST be called before any workspace operations (file reads, code analysis, development tasks). "
         "WHEN TO USE: When you need to check the current status of tasks, review what's pending "
         "or completed, or get context about ongoing work in this workspace. "
         "You can also use this tool to pick up your previous progress. "
         "WHEN NOT TO USE: When you want to update tasks (use todo_write instead). "
         "or you do not want to interact with current workspace. "
         "RETURNS: A list of todo objects with their current status, priority, and metadata. "
-        "Each workspace maintains its own isolated todo list. "
-        "IMPORTANT NOTE: You must use this tool along with other todo tools everytime you interact "
-        "with a workspace, including explaining the workspace or developing with the workspace.",
+        "Each workspace maintains its own isolated todo list."
+        "CRITICAL: Skipping this tool when doing workspace operations violates the protocol. "
+        "EXAMPLE: for a create an app/project or related requests, do read todos to pick up the progress.",
         "inputSchema": {
             "type": "object",
             "properties": {},
@@ -267,14 +257,15 @@ def todo_write_tool():
     return {
         "name": "todo_write",
         "description": "Update the entire task list (complete replacement) for the current workspace. "
+        "MANDATORY: This tool MUST be called when adding new tasks or updating task progress during workspace operations. "
         "WHEN TO USE: When you need to add new tasks, update task status, modify priorities, "
         "or reorganize the task list. This replaces the entire list with validation. "
         "WHEN NOT TO USE: When you only want to read current tasks (use todo_read instead), "
         "or you do not want to interact with current workspace. "
         "RETURNS: Success status and count of tasks written. Enforces business rules like "
         "unique IDs and single in-progress task constraint. "
-        "IMPORTANT NOTE: You must use this tool along with other todo tools everytime you interact "
-        "with a workspace, including explaining the workspace or developing with the workspace.",
+        "CRITICAL: Task management is required for all workspace development activities. "
+        "EXAMPLE: for a create an app/project or requests, do write todos to create the tasks.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -305,21 +296,19 @@ def todo_update_tool():
     return {
         "name": "todo_update",
         "description": "Update a specific todo item by ID without replacing the entire list. "
+        "MANDATORY: This tool MUST be called when updating task progress during workspace operations. "
         "WHEN TO USE: When you need to update specific fields of a single todo (status, priority, content, etc.). "
         "More efficient than todo_write when only updating one task. "
         "WHEN NOT TO USE: When you need to update multiple todos at once (use todo_write instead). "
         "or you do not want to interact with current workspace. "
         "RETURNS: The updated todo and status counts (pending, in_progress, completed). "
         "Enforces business rules like unique IDs and single in-progress task constraint. "
-        "IMPORTANT NOTE: You must use this tool along with other todo tools everytime you interact "
-        "with a workspace, including explaining the workspace or developing with the workspace.",
+        "CRITICAL: Task management is required for all workspace development activities. "
+        "EXAMPLE: for a create an app/project or related request, do update todos to update the task.",
         "inputSchema": {
             "type": "object",
             "properties": {
-                "todo_id": {
-                    "type": "string",
-                    "description": "The unique ID of the todo to update."
-                },
+                "todo_id": {"type": "string", "description": "The unique ID of the todo to update."},
                 "updates": {
                     "type": "object",
                     "description": "Fields to update in the todo. Can include content, status, priority, or metadata.",
@@ -330,7 +319,7 @@ def todo_update_tool():
                         "metadata": {"type": "object", "description": "Additional data for the task.", "additionalProperties": True},
                     },
                     "additionalProperties": True,
-                }
+                },
             },
             "required": ["todo_id", "updates"],
         },

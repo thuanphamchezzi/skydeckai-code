@@ -232,11 +232,15 @@ def edit_file_tool():
         "description": "Make line-based edits to a text file. "
             "WHEN TO USE: When you need to make selective changes to specific parts of a file while preserving the rest of the content. "
             "Useful for modifying configuration values, updating text while maintaining file structure, or making targeted code changes. "
+            "IMPORTANT: For multiple edits to the same file, use a single tool call with multiple edits in the 'edits' array rather than multiple tool calls. "
+            "This is more efficient and ensures all edits are applied atomically. "
             "WHEN NOT TO USE: When you want to completely replace a file's contents (use write_file instead), when you need to create a new file (use write_file instead), "
             "or when you want to apply highly complex edits with context. "
             "RETURNS: A git-style diff showing the changes made, along with information about any failed matches. "
             "The response includes sections for failed matches (if any) and the unified diff output. "
-            "Always use dryRun first to preview changes before applying them. Only works within the allowed directory.",
+            "Only works within the allowed directory. "
+            "EXAMPLES: For a single edit: {\"path\": \"config.js\", \"edits\": [{\"oldText\": \"port: 3000\", \"newText\": \"port: 8080\"}]}. "
+            "For multiple edits: {\"path\": \"app.py\", \"edits\": [{\"oldText\": \"debug=False\", \"newText\": \"debug=True\"}, {\"oldText\": \"version='1.0'\", \"newText\": \"version='2.0'\"}]}",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -260,20 +264,26 @@ def edit_file_tool():
                         },
                         "required": ["oldText", "newText"]
                     },
-                    "description": "List of edit operations to perform on the file. Each edit specifies text to find (oldText) and text to replace it with (newText). The edits are applied in sequence, and each one can modify the result of previous edits."
-                },
-                "dryRun": {
-                    "type": "boolean",
-                    "description": "Preview changes without applying them to the file. Set to true to see what changes would be made without actually modifying the file. Highly recommended before making actual changes.",
-                    "default": False
+                    "description": "MUST be an array of edit objects, NOT a string. Each edit object must contain 'oldText' and 'newText' properties. "
+                                   "For multiple edits, use: [{\"oldText\": \"text1\", \"newText\": \"replacement1\"}, {\"oldText\": \"text2\", \"newText\": \"replacement2\"}]. "
+                                   "For single edit, still use array: [{\"oldText\": \"text\", \"newText\": \"replacement\"}]. "
+                                   "The edits are applied in sequence, and each one can modify the result of previous edits. "
+                                   "AVOID multiple tool calls for the same file - instead, group all edits into a single call."
                 },
                 "options": {
                     "type": "object",
                     "properties": {
                         "partialMatch": {
                             "type": "boolean",
-                            "description": "Enable fuzzy matching for finding text. When true, the tool will try to find the best match even if it's not an exact match, using a confidence threshold of 80%.",
+                            "description": "Enable fuzzy matching for finding text. When true, the tool will try to find the best match even if it's not an exact match, using the confidenceThreshold (default 80%).",
                             "default": True
+                        },
+                        "confidenceThreshold": {
+                            "type": "number",
+                            "description": "Minimum confidence threshold for fuzzy matching (0.0 to 1.0). Higher values require more exact matches. Default is 0.8 (80% confidence).",
+                            "minimum": 0.0,
+                            "maximum": 1.0,
+                            "default": 0.8
                         }
                     }
                 }
@@ -784,11 +794,17 @@ def find_best_match(content: str, pattern: str, partial_match: bool = True) -> t
 
     return best_start, best_end, best_score
 
-async def apply_file_edits(file_path: str, edits: List[dict], dry_run: bool = False, options: dict = None) -> str:
-    """Apply edits to a file with optional formatting and return diff."""
+async def apply_file_edits(file_path: str, edits: List[dict], options: dict = None) -> tuple[str, bool, int, int]:
+    """Apply edits to a file with optional formatting and return diff.
+    
+    Returns:
+        tuple: (result_text, has_changes, successful_edits, failed_edits)
+    """
     # Set default options
     options = options or {}
     partial_match = options.get('partialMatch', True)
+    # Use 0.8 confidence threshold to prevent false positives while allowing reasonable fuzzy matches
+    confidence_threshold = options.get('confidenceThreshold', 0.8)
 
     # Read file content
     with open(file_path, 'r', encoding='utf-8') as f:
@@ -797,9 +813,10 @@ async def apply_file_edits(file_path: str, edits: List[dict], dry_run: bool = Fa
     # Track modifications
     modified_content = content
     failed_matches = []
+    successful_edits = []
 
     # Apply each edit
-    for edit in edits:
+    for edit_idx, edit in enumerate(edits):
         old_text = edit['oldText']
         new_text = edit['newText']
 
@@ -810,7 +827,7 @@ async def apply_file_edits(file_path: str, edits: List[dict], dry_run: bool = Fa
         # Find best match
         start, end, confidence = find_best_match(working_content, search_text, partial_match)
 
-        if confidence >= 0.8:
+        if confidence >= confidence_threshold:
             # Fix indentation while preserving relative structure
             if start >= 0:
                 # Get the indentation of the first line of the matched text
@@ -851,31 +868,77 @@ async def apply_file_edits(file_path: str, edits: List[dict], dry_run: bool = Fa
 
             # Apply the edit
             modified_content = modified_content[:start] + replacement + modified_content[end:]
+            successful_edits.append({
+                'index': edit_idx,
+                'oldText': old_text,
+                'newText': new_text,
+                'confidence': confidence
+            })
         else:
             failed_matches.append({
+                'index': edit_idx,
                 'oldText': old_text,
+                'newText': new_text,
                 'confidence': confidence,
                 'bestMatch': working_content[start:end] if start >= 0 and end > start else None
             })
 
     # Create diff
     diff = create_unified_diff(content, modified_content, os.path.basename(file_path))
+    has_changes = modified_content != content
 
-    # Write changes if not dry run
-    if not dry_run and not failed_matches:
+    # CRITICAL FIX: Write changes even if some edits failed (partial success)
+    # This prevents the infinite retry loop
+    if has_changes:
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(modified_content)
 
-    # Return results
-    failed_matches_text = '=== Failed Matches ===\n' + json.dumps(failed_matches, indent=2) + '\n\n' if failed_matches else ''
-    diff_text = f'=== Diff ===\n{diff}'
-    return failed_matches_text + diff_text
+    # Build comprehensive result message
+    result_parts = []
+    
+    # Summary
+    total_edits = len(edits)
+    successful_count = len(successful_edits)
+    failed_count = len(failed_matches)
+    
+    result_parts.append(f'=== Edit Summary ===')
+    result_parts.append(f'Total edits: {total_edits}')
+    result_parts.append(f'Successful: {successful_count}')
+    result_parts.append(f'Failed: {failed_count}')
+    result_parts.append(f'File modified: {has_changes}')
+    result_parts.append('')
+    
+    # Failed matches details
+    if failed_matches:
+        result_parts.append('=== Failed Matches ===')
+        for failed in failed_matches:
+            result_parts.append(f"Edit #{failed['index'] + 1}: Confidence {failed['confidence']:.2f}")
+            result_parts.append(f"  Searched for: {repr(failed['oldText'][:100])}...")
+            if failed['bestMatch']:
+                result_parts.append(f"  Best match: {repr(failed['bestMatch'][:100])}...")
+            result_parts.append('')
+    
+    # Successful edits
+    if successful_edits:
+        result_parts.append('=== Successful Edits ===')
+        for success in successful_edits:
+            result_parts.append(f"Edit #{success['index'] + 1}: Confidence {success['confidence']:.2f}")
+        result_parts.append('')
+    
+    # Diff
+    if diff.strip():
+        result_parts.append('=== Diff ===')
+        result_parts.append(diff)
+    else:
+        result_parts.append('=== No Changes ===')
+        result_parts.append('No modifications were made to the file.')
+    
+    return '\n'.join(result_parts), has_changes, successful_count, failed_count
 
 async def handle_edit_file(arguments: dict):
     """Handle editing a file with pattern matching and formatting."""
     path = arguments.get("path")
     edits = arguments.get("edits")
-    dry_run = arguments.get("dryRun", False)
     options = arguments.get("options", {})
 
     if not path:
@@ -900,8 +963,14 @@ async def handle_edit_file(arguments: dict):
         raise ValueError(f"Access denied: Path ({full_path}) must be within allowed directory ({state.allowed_directory})")
 
     try:
-        result = await apply_file_edits(full_path, edits, dry_run, options)
-        return [TextContent(type="text", text=result)]
+        result_text, has_changes, successful_count, failed_count = await apply_file_edits(full_path, edits, options)
+        
+        # CRITICAL FIX: Raise an exception only if ALL edits failed AND no changes were made
+        # This prevents silent failures that cause infinite retry loops
+        if failed_count > 0 and successful_count == 0:
+            raise ValueError(f"All {failed_count} edits failed to match. No changes were made to the file. Check the 'oldText' patterns and ensure they match the file content exactly.")
+        
+        return [TextContent(type="text", text=result_text)]
     except Exception as e:
         raise ValueError(f"Error editing file: {str(e)}")
 

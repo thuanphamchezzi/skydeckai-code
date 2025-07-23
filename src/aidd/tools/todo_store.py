@@ -117,7 +117,6 @@ class TodoStore:
             # Ensure required fields have defaults
             processed_todo.setdefault("id", self._generate_id())
             processed_todo.setdefault("status", "pending")
-            processed_todo.setdefault("priority", "medium")
             processed_todo.setdefault("created_at", current_time)
             processed_todo["updated_at"] = current_time
 
@@ -175,7 +174,7 @@ class TodoStore:
             raise ValueError("Todos must be a list")
 
         # Check for required fields and collect IDs
-        required_fields = {"id", "content", "status", "priority"}
+        required_fields = {"id", "content", "status"}
         seen_ids = set()
         in_progress_count = 0
 
@@ -204,9 +203,6 @@ class TodoStore:
             if todo["status"] == "in_progress":
                 in_progress_count += 1
 
-            # Validate priority
-            if todo["priority"] not in ["high", "medium", "low"]:
-                raise ValueError(f"Todo at index {i} has invalid priority: {todo['priority']}")
 
             # Validate content
             if not isinstance(todo["content"], str) or not todo["content"].strip():

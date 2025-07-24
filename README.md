@@ -810,7 +810,7 @@ This tool executes arbitrary shell commands on your system. Always:
 
 ### Todo Tools
 
-The todo tools provide task management capabilities for tracking work progress within each workspace.
+The todo tools provide sequential task management capabilities for workspace-first development workflows. Tasks are executed in order without priority systems, ensuring structured progress through development phases.
 
 #### todo_read
 
@@ -828,7 +828,6 @@ Read the current todo list for the workspace.
       "id": "abc123",
       "content": "Implement user authentication",
       "status": "in_progress",
-      "priority": "high",
       "metadata": {
         "custom_key": "custom_value"
       },
@@ -843,7 +842,7 @@ Read the current todo list for the workspace.
 
 #### todo_write
 
-Replace the entire todo list with validation.
+Replace the entire todo list for sequential execution workflow. Tasks are executed in array order, building upon previous work.
 
 ```json
 {
@@ -851,39 +850,37 @@ Replace the entire todo list with validation.
     {
       "id": "task1",
       "content": "Set up database schema",
-      "status": "pending",
-      "priority": "high"
+      "status": "pending"
     },
     {
       "id": "task2", 
       "content": "Create API endpoints",
       "status": "pending",
-      "priority": "medium",
       "metadata": {
         "custom_key": "custom_value"
-      },
+      }
     }
   ]
 }
 ```
 
-**Business Rules:**
+**Sequential Workflow Rules:**
 - Each todo must have unique ID
-- Only one task can be "in_progress" at a time
-- Required fields: id, content, status, priority
+- Only one task can be "in_progress" at a time (sequential execution)
+- Tasks execute in array order - no priority system
+- Required fields: id, content, status
 - Status values: "pending", "in_progress", "completed"
-- Priority values: "high", "medium", "low"
+- Workspace-first: Todo management is mandatory for all workspace operations
 
 #### todo_update
 
-Update a specific todo item by ID.
+Update a specific todo item by ID for sequential workflow progression.
 
 ```json
 {
   "todo_id": "task1",
   "updates": {
     "status": "in_progress",
-    "priority": "high",
     "metadata": {
         "new_key": "new_value"
     }
@@ -899,7 +896,6 @@ Update a specific todo item by ID.
     "id": "task1",
     "content": "Set up database schema",
     "status": "in_progress",
-    "priority": "high",
     "updated_at": "2023-10-01T12:00:00Z",
     "metadata": {
         "new_key": "new_value"
@@ -921,14 +917,13 @@ Update a specific todo item by ID.
 # Read current todos
 skydeckai-code-cli --tool todo_read
 
-# Create initial todo list
+# Create initial sequential todo list
 skydeckai-code-cli --tool todo_write --args '{
   "todos": [
     {
       "id": "setup",
       "content": "Initialize project structure",
-      "status": "pending",
-      "priority": "high"
+      "status": "pending"
     }
   ]
 }'
@@ -942,7 +937,7 @@ skydeckai-code-cli --tool todo_update --args '{
 }'
 ```
 
-The todo system maintains separate lists for each workspace and automatically manages timestamps and validation rules.
+The todo system maintains separate sequential task lists for each workspace, enforcing mandatory usage for all workspace operations. Tasks execute in order, building upon previous work without priority-based scheduling.
 
 ## Configuration
 

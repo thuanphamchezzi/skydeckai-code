@@ -137,13 +137,20 @@ class TodoStore:
 
         # Find the todo to update
         todo_index = None
+        original_todo = None
         for i, todo in enumerate(todos):
             if todo["id"] == todo_id:
                 todo_index = i
+                original_todo = todo
                 break
 
-        if todo_index is None:
+        if todo_index is None or original_todo is None:
             raise ValueError(f"Todo with ID '{todo_id}' not found")
+
+        # Check if status is changing to completed
+        original_status = original_todo["status"]
+        new_status = updates.get("status", original_status)
+        is_completing = original_status != "completed" and new_status == "completed"
 
         # Create updated todo
         updated_todo = dict(todos[todo_index])
@@ -166,7 +173,34 @@ class TodoStore:
         in_progress_count = sum(1 for t in updated_todos if t["status"] == "in_progress")
         completed_count = sum(1 for t in updated_todos if t["status"] == "completed")
 
-        return {"updated_todo": updated_todo, "counts": {"pending": pending_count, "in_progress": in_progress_count, "completed": completed_count, "total": len(updated_todos)}}
+        result = {"updated_todo": updated_todo, "counts": {"pending": pending_count, "in_progress": in_progress_count, "completed": completed_count, "total": len(updated_todos)}}
+
+        # If a todo was just completed, find and include the next pending todo
+        if is_completing:
+            next_todo = self._find_next_pending_todo(updated_todos, todo_index)
+            if next_todo:
+                result["next_todo"] = next_todo
+            else:
+                result["next_todo"] = None
+                result["message"] = "All todos completed! No more pending tasks."
+
+        return result
+
+    def _find_next_pending_todo(self, todos: List[Dict[str, Any]], completed_index: int) -> Dict[str, Any] | None:
+        """Find the next pending todo after the completed one in sequential order."""
+        # Look for the next pending todo starting from the position after the completed one
+        for i in range(completed_index + 1, len(todos)):
+            if todos[i]["status"] == "pending":
+                return todos[i]
+        
+        # If no pending todo found after the completed one, look from the beginning
+        # This handles cases where todos might be reordered or the completed one wasn't the first in-progress
+        for i in range(completed_index):
+            if todos[i]["status"] == "pending":
+                return todos[i]
+        
+        # No pending todos found
+        return None
 
     def _validate_todos(self, todos: List[Dict[str, Any]]) -> None:
         """Validate todos according to business rules."""

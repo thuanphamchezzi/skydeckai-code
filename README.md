@@ -8,13 +8,13 @@ An MCP server that provides a comprehensive set of tools for AI-driven developme
 
 This mcp server was formerly known as `mcp-server-aidd`. It was renamed to `skydeckai-code` to credit the team at [SkyDeck.ai](https://skydeck.ai) with creating this application along with [East Agile](https://eastagile.com). But more importantly we realized that the term AI Driven Development (AIDD) was just not catching on. People did not understand at a glance what it was about. And nor did LLMs. "Code" was far more intuitive. And linguistically intuitive is important in the world of agentic AI.
 
-<a href="https://glama.ai/mcp/servers/mpixtij6se"><img width="380" height="200" src="https://glama.ai/mcp/servers/mpixtij6se/badge" alt="AiDD Server MCP server" /></a>
+[![Verified on MseeP](https://mseep.ai/badge.svg)](https://mseep.ai/app/fe7a40fd-30c1-4767-84f9-d33bf997497e)
 
 ## Installation
 
 ```bash
-# Using pip
-pip install skydeckai-code
+# Using uvx
+uvx skydeckai-code
 ```
 
 ## Claude Desktop Setup
@@ -34,9 +34,9 @@ Add to your `claude_desktop_config.json`:
 
 ## SkyDeck AI Helper App
 
-If you're using SkyDeck AI Helper app, you can search for "SkyDeckAI Code" and install it.
+If you're using MseeP AI Helper app, you can search for "SkyDeckAI Code" and install it.
 
-![SkyDeck AI Helper App](/screenshots/skydeck_ai_helper.png)
+![MseeP AI Helper App](/screenshots/mseep_ai_helper.png)
 
 ## Key Features
 
@@ -99,34 +99,6 @@ If you're using SkyDeck AI Helper app, you can search for "SkyDeckAI Code" and i
 | delete_file   | path: string                                               | Success confirmation                          |
 | get_file_info | path: string                                               | File metadata (size, timestamps, permissions) |
 
-**CLI Usage:**
-
-```bash
-# Read entire file
-skydeckai-code-cli --tool read_file --args '{"files": [{"path": "src/main.py"}]}'
-
-# Read 10 lines starting from line 20
-skydeckai-code-cli --tool read_file --args '{"files": [{"path": "src/main.py", "offset": 20, "limit": 10}]}'
-
-# Read from line 50 to the end of the file
-skydeckai-code-cli --tool read_file --args '{"files": [{"path": "src/main.py", "offset": 50}]}'
-
-# Read multiple files with different line ranges
-skydeckai-code-cli --tool read_file --args '{"files": [
-  {"path": "src/main.py", "offset": 1, "limit": 10},
-  {"path": "README.md"}
-]}'
-
-# Write file
-skydeckai-code-cli --tool write_file --args '{"path": "output.txt", "content": "Hello World"}'
-
-# Copy file or directory
-skydeckai-code-cli --tool copy_file --args '{"source": "config.json", "destination": "config.backup.json"}'
-
-# Get file info
-skydeckai-code-cli --tool get_file_info --args '{"path": "src/main.py"}'
-```
-
 ### Complex File Operations
 
 #### edit_file
@@ -176,16 +148,6 @@ Generates complete directory structure:
 
 Returns: JSON tree structure of directory contents.
 
-**CLI Usage:**
-
-```bash
-# List directory
-skydeckai-code-cli --tool list_directory --args '{"path": "."}'
-
-# Search for Python files
-skydeckai-code-cli --tool search_files --args '{"pattern": ".py", "path": "src"}'
-```
-
 ### Code Analysis
 
 #### codebase_mapper
@@ -220,19 +182,6 @@ Supported Languages:
 -   C# (.cs)
 -   Kotlin (.kt, .kts)
 
-**CLI Usage:**
-
-```bash
-# Map the entire codebase structure
-skydeckai-code-cli --tool codebase_mapper --args '{"path": "."}'
-
-# Map only the source directory
-skydeckai-code-cli --tool codebase_mapper --args '{"path": "src"}'
-
-# Map a specific component or module
-skydeckai-code-cli --tool codebase_mapper --args '{"path": "src/components"}'
-```
-
 #### search_code
 
 Fast content search tool using regular expressions:
@@ -263,29 +212,6 @@ Matching lines grouped by file with line numbers, sorted by file modification ti
 
 This tool uses ripgrep when available for optimal performance, with a Python fallback implementation. It's ideal for finding specific code patterns like function declarations, imports, variable usages, or error handling.
 
-**CLI Usage:**
-
-```bash
-# Find function and class declarations in JavaScript files
-skydeckai-code-cli --tool search_code --args '{
-    "patterns": ["function\\s+\\w+", "class\\s+\\w+"],
-    "include": "*.js"
-}'
-
-# Find all console.log statements with errors or warnings
-skydeckai-code-cli --tool search_code --args '{
-    "patterns": ["console\\.log.*[eE]rror", "console\\.log.*[wW]arning"],
-    "path": "src"
-}'
-
-# Find import and export statements in TypeScript files
-skydeckai-code-cli --tool search_code --args '{
-    "patterns": ["import.*from", "export.*"],
-    "include": "*.{ts,tsx}",
-    "exclude": "node_modules/**"
-}'
-```
-
 ### System Information
 
 | Tool            | Parameters | Returns                      |
@@ -315,13 +241,6 @@ Returns:
 ```
 
 Provides essential system information in a clean, readable format.
-
-**CLI Usage:**
-
-```bash
-# Get system information
-skydeckai-code-cli --tool get_system_info
-```
 
 ### Screen Context and Image Tools
 
@@ -486,28 +405,6 @@ Response content as text with HTTP status code and size information. For binary 
 
 This tool can be used to access web APIs, fetch documentation, or download content from the web while respecting size limits (10MB max) and security constraints.
 
-**CLI Usage:**
-
-```bash
-# Fetch JSON from an API
-skydeckai-code-cli --tool web_fetch --args '{
-    "url": "https://api.github.com/users/octocat",
-    "headers": {"Accept": "application/json"}
-}'
-
-# Download content to a file
-skydeckai-code-cli --tool web_fetch --args '{
-    "url": "https://github.com/github/github-mcp-server/blob/main/README.md",
-    "save_to_file": "downloads/readme.md"
-}'
-
-# Fetch a webpage and convert to markdown for better readability
-skydeckai-code-cli --tool web_fetch --args '{
-    "url": "https://example.com",
-    "convert_html_to_markdown": true
-}'
-```
-
 #### web_search
 
 Performs a robust web search using multiple search engines and returns concise, relevant results.
@@ -533,27 +430,6 @@ Performs a robust web search using multiple search engines and returns concise, 
 A list of search results formatted in markdown, including titles, URLs, and snippets for each result. Results are deduplicated and organized hierarchically for easy reading.
 
 This tool uses a multi-engine approach that tries different search engines with various parsing strategies to ensure reliable results. You can specify a preferred engine, but some engines may block automated access, in which case the tool will fall back to alternative engines when "auto" is selected.
-
-**CLI Usage:**
-
-```bash
-# Search with default settings (auto engine selection)
-skydeckai-code-cli --tool web_search --args '{
-    "query": "latest python release features"
-}'
-
-# Try DuckDuckGo if you want alternative results
-skydeckai-code-cli --tool web_search --args '{
-    "query": "machine learning frameworks comparison",
-    "search_engine": "duckduckgo"
-}'
-
-# Use Bing for reliable results
-skydeckai-code-cli --tool web_search --args '{
-    "query": "best programming practices 2023",
-    "search_engine": "bing"
-}'
-```
 
 ### Utility Tools
 
@@ -608,47 +484,6 @@ This tool provides efficient execution of multiple operations in a single reques
 1. Use paths relative to the current working directory (e.g., "project/src" rather than just "src"), or
 2. Include an explicit tool invocation to change directories using `update_allowed_directory`
 
-**CLI Usage:**
-
-```bash
-# Setup a new project with multiple steps in sequential order (using proper paths)
-skydeckai-code-cli --tool batch_tools --args '{
-    "description": "Setup new project",
-    "sequential": true,
-    "invocations": [
-        {"tool": "create_directory", "arguments": {"path": "project"}},
-        {"tool": "create_directory", "arguments": {"path": "project/src"}},
-        {"tool": "write_file", "arguments": {"path": "project/README.md", "content": "# Project\n\nA new project."}}
-    ]
-}'
-
-# Create nested structure using relative paths (without changing directory)
-skydeckai-code-cli --tool batch_tools --args '{
-    "description": "Create project structure",
-    "sequential": true,
-    "invocations": [
-        {"tool": "create_directory", "arguments": {"path": "project/src"}},
-        {"tool": "create_directory", "arguments": {"path": "project/docs"}},
-        {"tool": "write_file", "arguments": {"path": "project/README.md", "content": "# Project"}}
-    ]
-}'
-
-# Gather system information and take a screenshot (tasks can run in parallel)
-skydeckai-code-cli --tool batch_tools --args '{
-    "description": "System diagnostics",
-    "sequential": false,
-    "invocations": [
-        {"tool": "get_system_info", "arguments": {}},
-        {"tool": "capture_screenshot", "arguments": {
-            "output_path": "diagnostics/screen.png",
-            "capture_mode": {
-                "type": "full"
-            }
-        }}
-    ]
-}'
-```
-
 #### think
 
 A tool for complex reasoning and brainstorming without making changes to the repository.
@@ -668,20 +503,6 @@ A tool for complex reasoning and brainstorming without making changes to the rep
 Your thoughts formatted as markdown, with a note indicating this was a thinking exercise.
 
 This tool is useful for thinking through complex problems, brainstorming solutions, or laying out implementation plans without making any actual changes. It's a great way to document your reasoning process, evaluate different approaches, or plan out a multi-step strategy before taking action.
-
-**CLI Usage:**
-
-```bash
-# Analyze a bug and plan a fix
-skydeckai-code-cli --tool think --args '{
-    "thought": "# Bug Analysis\n\n## Observed Behavior\nThe login endpoint returns a 500 error when email contains Unicode characters.\n\n## Root Cause\nThe database adapter is not properly encoding Unicode strings before constructing the SQL query.\n\n## Potential Fixes\n1. Update the database adapter to use parameterized queries\n2. Add input validation to reject Unicode in emails\n3. Encode email input manually before database operations\n\nFix #1 is the best approach as it solves the core issue and improves security."
-}'
-
-# Evaluate design alternatives
-skydeckai-code-cli --tool think --args '{
-    "thought": "# API Design Options\n\n## REST vs GraphQL\nFor this use case, GraphQL would provide more flexible data fetching but adds complexity. REST is simpler and sufficient for our current needs.\n\n## Authentication Methods\nJWT-based authentication offers stateless operation and better scalability compared to session-based auth.\n\nRecommendation: Use REST with JWT authentication for the initial implementation."
-}'
-```
 
 ### Code Execution
 
@@ -712,34 +533,6 @@ Executes code in various programming languages with safety measures and restrict
 | language | string | Yes | Programming language to use |
 | code | string | Yes | Code to execute |
 | timeout | integer | No | Maximum execution time (default: 5s) |
-
-**CLI Usage:**
-
-```bash
-# Python example
-skydeckai-code-cli --tool execute_code --args '{
-    "language": "python",
-    "code": "print(sum(range(10)))"
-}'
-
-# JavaScript example
-skydeckai-code-cli --tool execute_code --args '{
-    "language": "javascript",
-    "code": "console.log(Array.from({length: 5}, (_, i) => i*2))"
-}'
-
-# Ruby example
-skydeckai-code-cli --tool execute_code --args '{
-    "language": "ruby",
-    "code": "puts (1..5).reduce(:+)"
-}'
-
-# Go example
-skydeckai-code-cli --tool execute_code --args '{
-    "language": "go",
-    "code": "fmt.Println(\"Hello, Go!\")"
-}'
-```
 
 **Requirements:**
 
@@ -772,25 +565,6 @@ Executes shell scripts (bash/sh) with safety measures and restrictions.
 |-----------|---------|----------|---------------------------------------|
 | script | string | Yes | Shell script to execute |
 | timeout | integer | No | Maximum execution time (default: 300s, max: 600s) |
-
-**CLI Usage:**
-
-```bash
-# List directory contents with details
-skydeckai-code-cli --tool execute_shell_script --args '{
-    "script": "ls -la"
-}'
-
-# Find all Python files recursively
-skydeckai-code-cli --tool execute_shell_script --args '{
-    "script": "find . -name \"*.py\" -type f"
-}'
-
-# Complex script with multiple commands
-skydeckai-code-cli --tool execute_shell_script --args '{
-    "script": "echo \"System Info:\" && uname -a && echo \"\nDisk Usage:\" && df -h"
-}'
-```
 
 **Features:**
 
@@ -947,20 +721,6 @@ Configuration file: `~/.skydeckai_code/config.json`
 {
     "allowed_directory": "/path/to/workspace"
 }
-```
-
-## CLI Usage
-
-Basic command structure:
-
-```bash
-skydeckai-code-cli --tool <tool_name> --args '<json_arguments>'
-
-# List available tools
-skydeckai-code-cli --list-tools
-
-# Enable debug output
-skydeckai-code-cli --debug --tool <tool_name> --args '<json_arguments>'
 ```
 
 ## Debugging

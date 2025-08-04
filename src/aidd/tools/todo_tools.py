@@ -7,12 +7,11 @@ def todo_read_tool():
     """Define the todo_read tool."""
     return {
         "name": "todo_read",
-        "description": "MANDATORY: Read workspace todo list. MUST be called FIRST before ANY workspace operations. "
-        "WORKSPACE-FIRST RULE: Required for all development tasks, file operations, project work. "
-        "USE: Check task status, understand project context, resume work. "
-        "NOT: Pure informational queries unrelated to workspace. "
-        "RETURNS: Sequential task list with status. Each workspace has isolated todos. "
-        "Examples: Project setup, code development, file modifications, analysis",
+        "description": "🚨 CRITICAL: MUST be called FIRST before ANY file/directory operations. WORKSPACE-BOUND REQUIREMENT. ⚠️ "
+        "ENFORCE: Every read_file, write_file, edit_file, directory operation REQUIRES checking todos first. "
+        "WORKSPACE ISOLATION: Each directory has isolated todo context - check current workspace todos before ANY action. "
+        "FATAL ERROR if skipped: File operations without todo context violate workflow protocol. "
+        "RETURNS: Active todo list for current directory/workspace. Essential for maintaining project state.",
         "inputSchema": {
             "type": "object",
             "properties": {},
@@ -25,11 +24,11 @@ def todo_write_tool():
     """Define the todo_write tool."""
     return {
         "name": "todo_write",
-        "description": "MANDATORY: Replace entire todo list for workspace planning. Sequential execution model. "
-        "USE: Plan projects, organize development phases, batch task updates. "
-        "NOT: Single task updates (use todo_update), reading (use todo_read). "
-        "CRITICAL: Only one task can be 'in_progress' at a time. Tasks execute in array order. "
-        "Examples: Project setup, feature development, bug fixing, refactoring",
+        "description": "🚨 WORKSPACE PROTOCOL: Create/replace todo list when no active todos exist for current directory. ⚠️ "
+        "TRIGGER: After todo_read returns empty list OR when starting new file/directory work. "
+        "MANDATORY WORKFLOW: 1) todo_read first 2) If empty→todo_write 3) Then proceed with file operations. "
+        "VIOLATION PREVENTION: Never perform write_file, edit_file, directory operations without active todo context. "
+        "EXECUTION RULE: Create essential todos only. One 'in_progress' maximum. Focus on key milestones not micro-tasks.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -58,11 +57,10 @@ def todo_update_tool():
     """Define the todo_update tool."""
     return {
         "name": "todo_update",
-        "description": "MANDATORY: Update specific todo by ID for workflow progression. "
-        "USE: Mark in-progress when starting, completed when finished. "
-        "NOT: Multiple updates (use todo_write), adding tasks. "
-        "Enforces sequential workflow - one active task only. "
-        "Example: todo_id='123', updates={\"status\": \"completed\"}",
+        "description": "🚨 WORKFLOW ENFORCEMENT: Update todo status during file/directory operations. REQUIRED after each task. ⚠️ "
+        "PROTOCOL: Mark 'in_progress' when starting task, 'completed' when finished. Update after EVERY file operation. "
+        "CRITICAL SYNC: Todo status must reflect actual work progress. Failure to update breaks workspace integrity. "
+        "SEQUENTIAL RULE: Only one task 'in_progress' at a time. Complete current before starting next.",
         "inputSchema": {
             "type": "object",
             "properties": {

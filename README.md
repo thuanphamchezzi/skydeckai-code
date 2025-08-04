@@ -685,32 +685,6 @@ Update a specific todo item by ID for sequential workflow progression.
 }
 ```
 
-**CLI Usage:**
-
-```bash
-# Read current todos
-skydeckai-code-cli --tool todo_read
-
-# Create initial sequential todo list
-skydeckai-code-cli --tool todo_write --args '{
-  "todos": [
-    {
-      "id": "setup",
-      "content": "Initialize project structure",
-      "status": "pending"
-    }
-  ]
-}'
-
-# Update a specific todo
-skydeckai-code-cli --tool todo_update --args '{
-  "todo_id": "setup",
-  "updates": {
-    "status": "completed"
-  }
-}'
-```
-
 The todo system maintains separate sequential task lists for each workspace, enforcing mandatory usage for all workspace operations. Tasks execute in order, building upon previous work without priority-based scheduling.
 
 ## Configuration

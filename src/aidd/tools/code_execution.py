@@ -31,8 +31,7 @@ def execute_code_tool() -> Dict[str, Any]:
             "Execute code snippets in sandbox. Supports: python, javascript, ruby, php, go, rust. "
             "USE: Test functions, compute values, prototype. "
             "NOT: File modifications, system operations, dependencies. "
-            "Auto-wraps Go/Rust main functions. Timeout: 30s max. "
-            "Examples: Python: 'print(sum(range(10)))', JS: 'console.log([1,2,3].map(x=>x*2))'"
+            "Auto-wraps Go/Rust main functions. Timeout: 30s max"
         ),
         "inputSchema": {
             "type": "object",
@@ -66,8 +65,7 @@ def execute_shell_script_tool() -> Dict[str, Any]:
             "Run bash/sh scripts for system tasks, git operations, linters. "
             "USE: System automation, file operations, version control, code linting. "
             "NOT: Structured programming (use execute_code), dangerous operations. "
-            "Timeout: 10 minutes maximum. "
-            "Examples: 'git status && npm test', 'eslint src/', 'find . -name \"*.py\" | head -10'"
+            "Timeout: 10 minutes maximum"
         ),
         "inputSchema": {
             "type": "object",

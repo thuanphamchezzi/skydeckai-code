@@ -17,8 +17,7 @@ def search_code_tool():
         "description": "Regex search in file contents. Uses ripgrep when available. "
                     "USE: Find function definitions, variable usage, code patterns. "
                     "NOT: File names (use search_files), semantic analysis. "
-                    "RETURNS: Matching lines with file paths, line numbers, sorted by modification time. "
-                    "Example: patterns=['class\\\\s+\\\\w+'], include='*.py'",
+                    "RETURNS: Matching lines with file paths, line numbers, sorted by modification time",
         "inputSchema": {
             "type": "object",
             "properties": {

@@ -16,7 +16,7 @@ def get_system_info_tool():
         "description": "System information: OS, hardware, resources, network. "
                     "USE: Environment analysis, compatibility checks, diagnostics. "
                     "NOT: Current directory (use get_allowed_directory), file info. "
-                    "RETURNS: JSON with OS/CPU/memory/disk stats, WiFi, Mac hardware details",
+                    "RETURNS: JSON with system stats, WiFi, Mac hardware details",
         "inputSchema": {
             "type": "object",
             "properties": {},

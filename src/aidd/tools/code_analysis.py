@@ -61,8 +61,7 @@ def codebase_mapper_tool():
                     "USE: Understand codebase architecture, discover code structure. "
                     "NOT: Text search (use search_code), single file analysis. "
                     "SUPPORTS: Python, JS/TS, Java, C++, Ruby, Go, Rust, PHP, C#, Kotlin. "
-                    "RETURNS: Text tree of classes/functions with statistics. "
-                    "Example: path='src' returns structural overview",
+                    "RETURNS: Text tree of classes/functions with statistics",
         "inputSchema": {
             "type": "object",
             "properties": {

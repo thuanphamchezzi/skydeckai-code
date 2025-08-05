@@ -17,7 +17,7 @@ def web_fetch_tool():
                     "USE: Get web data, API responses, documentation. "
                     "NOT: Complex auth, session management, OAuth interactions. "
                     "TIP: Use web_search first to find URLs. "
-                    "Auto-converts HTML to markdown. Example: url='https://api.github.com/repos/user/repo'",
+                    "Auto-converts HTML to markdown",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -181,8 +181,7 @@ def web_search_tool():
         "description": "Web search with Bing/DuckDuckGo. Returns titles, URLs, snippets. "
                     "USE: Find current information, research topics. "
                     "NOT: Private data, authenticated content, interactive sites. "
-                    "TIP: Use with web_fetch for detailed content. "
-                    "Example: query='python async best practices 2024', num_results=5",
+                    "TIP: Use with web_fetch for detailed content",
         "inputSchema": {
             "type": "object",
             "properties": {

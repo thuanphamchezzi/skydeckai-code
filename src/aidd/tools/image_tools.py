@@ -20,8 +20,7 @@ def read_image_file_tool():
         "description": "Read image as base64 data URI. Auto-resizes to 20-800px width. 100MB limit. "
                     "USE: View/process images, include in responses, analyze visual content. "
                     "NOT: Image metadata only, text files, very large images. "
-                    "RETURNS: data:image/format;base64,... string. Supports PNG/JPEG/GIF/WebP. "
-                    "Example: path='screenshots/screen.png'",
+                    "RETURNS: data:image/format;base64,... string. Supports PNG/JPEG/GIF/WebP",
         "inputSchema": {
             "type": "object",
             "properties": {

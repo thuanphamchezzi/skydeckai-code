@@ -14,8 +14,7 @@ def list_directory_tool():
         "description": "List directory contents with metadata. "
         "USE: Explore folder contents, check file sizes/dates. "
         "NOT: Recursive listing (use directory_tree), file content. "
-        "RETURNS: [DIR]/[FILE] entries with size and timestamps. "
-        "Example: path='src' shows files with type, size, modification date",
+        "RETURNS: [DIR]/[FILE] entries with size and timestamps",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -83,8 +82,7 @@ def create_directory_tool():
         "description": "Create directory or nested directories. "
         "USE: Set up project structure, organize files. "
         "NOT: Check existence (use get_file_info). "
-        "Succeeds silently if directory exists. "
-        "Example: path='src/components' creates nested directories",
+        "Succeeds silently if directory exists",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -138,8 +136,7 @@ def directory_tree_tool():
         "description": "Recursive JSON tree of directory structure. Uses git ls-files when available. "
         "USE: Understand project hierarchy, visualize structure. "
         "NOT: Single directory listing, file content analysis. "
-        "RETURNS: JSON with name/type/children. Excludes hidden files. "
-        "Example: path='.', max_depth=3 returns nested JSON structure",
+        "RETURNS: JSON with name/type/children. Excludes hidden files",
         "inputSchema": {
             "type": "object",
             "properties": {

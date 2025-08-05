@@ -12,8 +12,7 @@ def batch_tools_tool():
         "description": "Execute multiple tools in parallel/sequential. "
                     "USE: Bulk operations, coordinated tasks, multiple queries. "
                     "NOT: Sequential dependencies between steps, fine-grained error handling. "
-                    "All tools execute in same working directory context. "
-                    "Example: invocations=[{\"tool\": \"read_file\", \"arguments\": {\"files\": [...]}}]",
+                    "All tools execute in same working directory context",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -178,7 +177,7 @@ def think_tool():
         "description": "Structured reasoning for complex problems. Documents thought process without file changes. "
                     "USE: Planning architecture, debugging complex issues, weighing tradeoffs. "
                     "NOT: Simple explanations, direct coding, information retrieval. "
-                    "RETURNS: Markdown-formatted thinking process. Improves decision-making quality.",
+                    "RETURNS: Markdown-formatted thinking process",
         "inputSchema": {
             "type": "object",
             "properties": {

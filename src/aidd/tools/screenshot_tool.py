@@ -111,8 +111,7 @@ def capture_screenshot_tool():
                       "USE: Visual documentation, troubleshooting, UI reference. "
                       "NOT: Window info without capture (use get_available_windows). "
                       "Captures windows in background. Requires permissions on macOS. "
-                      "RETURNS: JSON with success, path, message. "
-                      "Example: capture_mode={\"type\": \"named_window\", \"window_name\": \"Chrome\"}",
+                      "RETURNS: JSON with success, path, message",
         "inputSchema": {
             "type": "object",
             "properties": {

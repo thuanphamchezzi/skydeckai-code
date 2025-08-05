@@ -11,7 +11,7 @@ def get_allowed_directory_tool():
         "description": "Get current allowed working directory. "
                       "USE: Understand workspace boundaries, verify file operation scope. "
                       "NOT: List directory contents (use list_directory). "
-                      "RETURNS: Absolute path to allowed workspace root",
+                      "RETURNS: Absolute path to workspace root",
         "inputSchema": {
             "type": "object",
             "properties": {},

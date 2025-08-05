@@ -20,8 +20,7 @@ def read_file_tool():
         "description": "Read file contents with optional line range. "
                     "USE: View source code, config files, text content. "
                     "NOT: File metadata (use get_file_info), directory listing. "
-                    "RETURNS: Complete text or specified line range with file headers. "
-                    "Example: files=[{\"path\": \"src/main.py\", \"offset\": 10, \"limit\": 50}]",
+                    "RETURNS: Complete text or specified line range with file headers",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -58,8 +57,7 @@ def write_file_tool():
         "description": "Create/overwrite file. Auto-creates parent directories. "
                     "USE: Save new content, generate files. "
                     "NOT: Targeted edits (use edit_file). "
-                    "WARNING: Overwrites existing files. "
-                    "Example: path='config.json', content='{\"debug\": true}'",
+                    "WARNING: Overwrites existing files",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -82,8 +80,7 @@ def move_file_tool():
         "description": "Move/rename file or directory. "
                     "USE: Reorganize files, rename items. "
                     "NOT: Copy operations (use copy_file). "
-                    "Auto-creates parent directories. "
-                    "Example: source='old.txt', destination='new/path/new.txt'",
+                    "Auto-creates parent directories",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -106,8 +103,7 @@ def copy_file_tool():
         "description": "Copy file or directory to new location. "
                     "USE: Duplicate files, create backups, replicate structures. "
                     "NOT: Move operations (use move_file). "
-                    "Recursive directory copying. Auto-creates parent directories. "
-                    "Example: source='config.json', destination='config.backup.json'",
+                    "Recursive directory copying. Auto-creates parent directories",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -135,8 +131,7 @@ def search_files_tool():
         "description": "Find files/directories by name pattern. Recursive, case-insensitive. "
                     "USE: Locate files by extension, find items with specific names. "
                     "NOT: Content search (use search_code), single directory listing. "
-                    "Shows tracked files in Git repos. "
-                    "Example: pattern='.py' finds Python files, pattern='test' finds test files",
+                    "Shows tracked files in Git repos",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -163,8 +158,7 @@ def get_file_info_tool():
         "description": "Get file metadata: size, timestamps, permissions, type. "
                     "USE: Check file properties without reading content. "
                     "NOT: Reading content (use read_file), directory listing. "
-                    "RETURNS: Type, size, creation/modification times, permissions. "
-                    "Example: path='src/main.py' returns file details",
+                    "RETURNS: Type, size, creation/modification times, permissions",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -183,8 +177,7 @@ def delete_file_tool():
         "description": "Delete file or empty directory. "
                     "USE: Remove unwanted files, clean up temporary files. "
                     "NOT: Non-empty directories (will fail). "
-                    "WARNING: Cannot be undone. Safety: only deletes empty directories. "
-                    "Example: path='old_file.txt'",
+                    "WARNING: Cannot be undone. Safety: only deletes empty directories",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -204,8 +197,7 @@ def edit_file_tool():
             "CRITICAL: Use single call with multiple edits array for efficiency. "
             "USE: Modify specific parts while preserving rest. "
             "NOT: Complete rewrites (use write_file). "
-            "RETURNS: Git-style diff with success/failure details. "
-            "Example: edits=[{\"oldText\": \"debug=False\", \"newText\": \"debug=True\"}]",
+            "RETURNS: Git-style diff with success/failure details",
         "inputSchema": {
             "type": "object",
             "properties": {
